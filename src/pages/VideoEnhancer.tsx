@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload, Video, MicVoice, Languages, Type, Share, Check, Sparkles, Loader2 } from "lucide-react";
+import { Upload, Video, Mic, Languages, Type, Share, Check, Sparkles, Loader2 } from "lucide-react";
 
 const VideoEnhancer = () => {
   const [uploadStage, setUploadStage] = useState("upload"); // upload, enhancing, preview
@@ -215,7 +214,7 @@ const VideoEnhancer = () => {
             
             <div>
               <h3 className="text-sm font-medium flex items-center mb-2">
-                <MicVoice className="w-4 h-4 mr-2 text-kala-accent" />
+                <Mic className="w-4 h-4 mr-2 text-kala-accent" />
                 Voice Options
               </h3>
               <div className="space-y-2">
