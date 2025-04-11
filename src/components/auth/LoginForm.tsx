@@ -4,30 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Mock login functionality
-    setTimeout(() => {
-      // In a real app, this would validate credentials with a backend
-      if (email && password) {
-        toast.success("Login successful!");
-        // Navigate to home after successful login
-        window.location.href = "/home";
-      } else {
-        toast.error("Please enter both email and password");
-      }
-      setIsLoading(false);
-    }, 1000);
+    const { error, success } = await signIn(email, password);
+    
+    if (error) {
+      toast.error(error.message || "Login failed");
+    } else if (success) {
+      toast.success("Login successful!");
+      navigate("/home");
+    }
+    
+    setIsLoading(false);
   };
 
   return (

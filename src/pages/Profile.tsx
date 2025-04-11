@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -7,34 +7,105 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Save, User, Instagram, Facebook, Twitter, Link as LinkIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Profile = () => {
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState({
-    name: "Rajesh Kumar",
-    bio: "Expert woodcarver from Jaipur with 15 years of experience creating traditional Rajasthani wooden artifacts.",
-    artworkType: "Wood Carving",
-    experience: "Expert",
-    location: "Jaipur, Rajasthan",
-    contactNumber: "+91 98765 43210",
-    email: "rajesh.kumar@example.com",
+    name: "",
+    bio: "",
+    artworkType: "Handicraft",
+    experience: "Beginner",
+    location: "",
+    contactNumber: "",
+    email: "",
     preferredLanguage: "Hindi",
     skills: ["Photography", "Marketing", "Design"],
     socialMedia: {
-      instagram: "rajesh_woodart",
-      facebook: "rajeshkumarwoodart",
-      twitter: "rajesh_creates",
-      website: "www.rajeshwoodart.com"
-    }
+      instagram: "",
+      facebook: "",
+      twitter: "",
+      website: ""
+    },
+    avatar_url: ""
   });
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    try {
+      if (!user) return;
+
+      setLoading(true);
+
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (profile) {
+        setProfileData({
+          ...profileData,
+          name: profile.full_name || '',
+          bio: profile.bio || '',
+          email: user.email || '',
+          avatar_url: profile.avatar_url || ''
+        });
+      }
+
+      setLoading(false);
+    } catch (error: any) {
+      toast.error('Error loading profile data');
+      console.error('Error loading profile:', error);
+      setLoading(false);
+    }
+  };
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
 
-  const handleSave = () => {
-    // In a real app, you would save changes to the backend here
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      if (!user) return;
+
+      setLoading(true);
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: profileData.name,
+          bio: profileData.bio,
+          avatar_url: profileData.avatar_url,
+          updated_at: new Date()
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Profile updated successfully');
+      setIsEditing(false);
+      setLoading(false);
+    } catch (error: any) {
+      toast.error('Error updating profile');
+      console.error('Error updating profile:', error);
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,9 +121,10 @@ const Profile = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-kala-primary">Artist Profile</h1>
         <Button 
-          onClick={handleEditToggle} 
+          onClick={isEditing ? handleSave : handleEditToggle} 
           variant="outline" 
           className="flex items-center gap-2"
+          disabled={loading}
         >
           {isEditing ? <Save className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
           {isEditing ? "Save" : "Edit Profile"}
@@ -64,9 +136,9 @@ const Profile = () => {
         <Card className="md:col-span-1">
           <CardContent className="pt-6 flex flex-col items-center">
             <Avatar className="h-24 w-24 mb-4">
-              <AvatarImage src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=250" alt={profileData.name} />
+              <AvatarImage src={profileData.avatar_url || "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=250"} alt={profileData.name} />
               <AvatarFallback className="bg-kala-primary text-white text-2xl">
-                {profileData.name.split(' ').map(n => n[0]).join('')}
+                {profileData.name ? profileData.name.split(' ').map(n => n[0]).join('') : <User />}
               </AvatarFallback>
             </Avatar>
             
@@ -79,6 +151,16 @@ const Profile = () => {
                     name="name" 
                     value={profileData.name} 
                     onChange={handleChange} 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="avatar_url">Avatar URL</Label>
+                  <Input 
+                    id="avatar_url" 
+                    name="avatar_url" 
+                    value={profileData.avatar_url} 
+                    onChange={handleChange} 
+                    placeholder="https://example.com/avatar.jpg"
                   />
                 </div>
                 <div>
@@ -102,7 +184,7 @@ const Profile = () => {
               </div>
             ) : (
               <div className="text-center">
-                <h2 className="text-xl font-semibold">{profileData.name}</h2>
+                <h2 className="text-xl font-semibold">{profileData.name || "Your Name"}</h2>
                 <p className="text-kala-accent font-medium">{profileData.artworkType}</p>
                 <Badge className="mt-2 bg-kala-light text-kala-primary hover:bg-kala-light">
                   {profileData.experience}
@@ -171,6 +253,7 @@ const Profile = () => {
                       name="email" 
                       value={profileData.email} 
                       onChange={handleChange} 
+                      disabled
                     />
                   </div>
                   <div>
@@ -183,33 +266,26 @@ const Profile = () => {
                     />
                   </div>
                 </div>
-                
-                <div className="mt-4">
-                  <Button onClick={handleSave} className="bg-kala-primary hover:bg-kala-secondary">
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Changes
-                  </Button>
-                </div>
               </>
             ) : (
               <>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Bio</h3>
-                  <p className="mt-1">{profileData.bio}</p>
+                  <p className="mt-1">{profileData.bio || "Add your bio to tell others about yourself and your artwork"}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Location</h3>
-                    <p className="mt-1">{profileData.location}</p>
+                    <p className="mt-1">{profileData.location || "Add your location"}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Contact Number</h3>
-                    <p className="mt-1">{profileData.contactNumber}</p>
+                    <p className="mt-1">{profileData.contactNumber || "Add your contact number"}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Email</h3>
-                    <p className="mt-1">{profileData.email}</p>
+                    <p className="mt-1">{profileData.email || user?.email || "Add your email"}</p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Preferred Language</h3>
@@ -249,7 +325,7 @@ const Profile = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
                     <div className="p-3 text-white">
                       <p className="font-medium">Artwork Title</p>
-                      <p className="text-sm opacity-80">Traditional Wooden Handicraft</p>
+                      <p className="text-sm opacity-80">Traditional Handicraft</p>
                     </div>
                   </div>
                 </div>
