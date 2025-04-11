@@ -12,6 +12,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
+import VideoEnhancer from "./pages/VideoEnhancer";
+import Community from "./pages/Community";
+import Explore from "./pages/Explore";
 
 const queryClient = new QueryClient();
 
@@ -27,12 +31,12 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/create" element={<VideoEnhancer />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/video-enhancer" element={<VideoEnhancer />} />
             {/* Placeholder routes for future implementation */}
-            <Route path="/explore" element={<Home />} />
-            <Route path="/create" element={<Home />} />
-            <Route path="/community" element={<Home />} />
-            <Route path="/profile" element={<Home />} />
-            <Route path="/video-enhancer" element={<Home />} />
             <Route path="/ad-generator" element={<Home />} />
             <Route path="/video-generator" element={<Home />} />
             <Route path="/tutorial" element={<Home />} />
