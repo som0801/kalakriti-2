@@ -1,92 +1,69 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 258 30% 98%;
+    --foreground: 258 10% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 258 10% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 258 10% 20%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 258 90% 66%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 258 31% 54%;
+    --secondary-foreground: 258 10% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 258 20% 96%;
+    --muted-foreground: 258 10% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 258 30% 94%;
+    --accent-foreground: 258 10% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 258 30% 88%;
+    --input: 258 30% 88%;
+    --ring: 258 90% 66%;
 
     --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 258 25% 12%;
+    --foreground: 258 10% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 258 25% 15%;
+    --card-foreground: 258 10% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 258 25% 15%;
+    --popover-foreground: 258 10% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 258 90% 66%;
+    --primary-foreground: 258 10% 95%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 258 31% 54%;
+    --secondary-foreground: 258 10% 95%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 258 25% 25%;
+    --muted-foreground: 258 10% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 258 25% 25%;
+    --accent-foreground: 258 10% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 258 10% 95%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 258 25% 25%;
+    --input: 258 25% 25%;
+    --ring: 258 90% 66%;
   }
 }
 
@@ -97,5 +74,32 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .kala-pattern {
+    background-color: #f8f7ff;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657l1.415 1.414L13.857 0H11.03zm32.284 0L39.9 3.414 42.28 0h-2.827zm-9.9 0L29 3.414 26.62 0h2.83zm15.743 0l-1.414 1.414L50.7 0h2.827zm-38.6 0l1.415 1.414L9.3 0H6.473zM45.14 0l-1.414 1.414L58.67 16.343l1.414-1.414L45.14 0zM14.86 0l1.414 1.414L1.33 16.343.257 15.23 14.86 0zm9.9 0l1.414 1.414-12.73 12.73-1.414-1.414L24.76 0zm15.743 0l-1.414 1.414 12.73 12.73 1.414-1.414L40.503 0zM54.627 5.373l.83.83L30.83 31.83 29.417 30.4l25.21-25.028zM5.373 5.373l-.83.83L29.17 31.83l1.414-1.414L5.374 5.374zm48.254 0l-1.414 1.415 10.92 10.92 1.414-1.414-10.92-10.92zm-45.527 0l1.414 1.415-10.92 10.92-1.415-1.414 10.92-10.92zm35.156 0L41.84 6.79l10.92 10.92 1.413-1.415-10.92-10.92zM18.744 5.373L20.16 6.79 9.234 17.708 7.82 16.294l10.92-10.92zm17.828 0L35.16 6.79l6.92 6.92 1.413-1.415-6.92-6.92zM23.744 5.373L25.16 6.79l-6.92 6.92-1.415-1.415 6.92-6.92zM35.16 11.5L30 16.657 24.84 11.5l-1.414 1.414L30 19.485l6.573-6.572L35.16 11.5z' fill='%238B5CF6' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E");
+  }
+  
+  .btn-primary {
+    @apply bg-kala-primary text-white rounded-full px-6 py-2 hover:bg-kala-secondary transition-colors focus:ring-2 focus:ring-kala-tertiary focus:outline-none;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-kala-primary border border-kala-primary rounded-full px-6 py-2 hover:bg-kala-light transition-colors focus:ring-2 focus:ring-kala-tertiary focus:outline-none;
+  }
+  
+  .input-primary {
+    @apply border-kala-neutral rounded-lg p-2 focus:ring-2 focus:ring-kala-primary focus:border-transparent focus:outline-none;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 transform hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .feature-card {
+    @apply bg-white rounded-2xl p-6 shadow-md card-hover;
   }
 }
