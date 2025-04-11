@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,37 +19,41 @@ import Community from "./pages/Community";
 import Explore from "./pages/Explore";
 import AdGenerator from "./pages/AdGenerator";
 
+// Create a new QueryClient instance
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/create" element={<VideoEnhancer />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/video-enhancer" element={<VideoEnhancer />} />
-            <Route path="/ad-generator" element={<AdGenerator />} />
-            {/* Placeholder routes for future implementation */}
-            <Route path="/ad-generator" element={<AdGenerator />} />
-            <Route path="/video-generator" element={<Home />} />
-            <Route path="/tutorial" element={<Home />} />
-            {/* 404 Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/create" element={<VideoEnhancer />} />
+                <Route path="/community" element={<Community />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/video-enhancer" element={<VideoEnhancer />} />
+                <Route path="/ad-generator" element={<AdGenerator />} />
+                {/* Note: Removed duplicate ad-generator route */}
+                <Route path="/video-generator" element={<Home />} />
+                <Route path="/tutorial" element={<Home />} />
+                {/* 404 Route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+};
 
 export default App;
