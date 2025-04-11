@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import VideoEnhancer from "./pages/VideoEnhancer";
 import Community from "./pages/Community";
 import Explore from "./pages/Explore";
+import AdGenerator from "./pages/AdGenerator";
 
 const queryClient = new QueryClient();
 
@@ -36,8 +37,9 @@ const App = () => (
             <Route path="/community" element={<Community />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/video-enhancer" element={<VideoEnhancer />} />
+            <Route path="/ad-generator" element={<AdGenerator />} />
             {/* Placeholder routes for future implementation */}
-            <Route path="/ad-generator" element={<Home />} />
+            <Route path="/ad-generator" element={<AdGenerator />} />
             <Route path="/video-generator" element={<Home />} />
             <Route path="/tutorial" element={<Home />} />
             {/* 404 Route */}

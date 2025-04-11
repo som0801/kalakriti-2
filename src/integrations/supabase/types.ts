@@ -9,7 +9,90 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      ad_projects: {
+        Row: {
+          ad_format: string
+          created_at: string | null
+          description: string | null
+          id: string
+          output_url: string | null
+          prompt: string
+          status: string
+          target_audience: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ad_format?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          output_url?: string | null
+          prompt: string
+          status?: string
+          target_audience?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ad_format?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          output_url?: string | null
+          prompt?: string
+          status?: string
+          target_audience?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      video_projects: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          prompt: string
+          status: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          prompt: string
+          status?: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          prompt?: string
+          status?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
