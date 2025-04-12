@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,10 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Image, Layout, Target, MessageSquare, PenTool, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 const AdGenerator = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const [formData, setFormData] = useState({
     title: "",
@@ -26,6 +26,7 @@ const AdGenerator = () => {
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [generatedText, setGeneratedText] = useState<string | null>(null);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -49,29 +50,47 @@ const AdGenerator = () => {
     try {
       setIsGenerating(true);
       
-      // Here we would normally call our AI generation API
-      // For now, let's simulate generation by waiting
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Mock generated image URL (in a real app, this would come from the API)
-      setGeneratedImage("https://placehold.co/600x400/8833ff/white?text=Generated+Ad");
-      
-      // Save the project to Supabase
-      const { data, error } = await supabase
-        .from('ad_projects')
-        .insert([{
-          title: formData.title || "Untitled Ad",
-          description: formData.description,
+      // Call the Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('generate-ad', {
+        body: {
           prompt: formData.prompt,
-          target_audience: formData.targetAudience,
-          ad_format: formData.adFormat,
-          status: "completed",
-          output_url: "https://placehold.co/600x400/8833ff/white?text=Generated+Ad",
-          thumbnail_url: "https://placehold.co/600x400/8833ff/white?text=Generated+Ad"
-        }])
-        .select();
+          title: formData.title,
+          description: formData.description,
+          targetAudience: formData.targetAudience,
+          adFormat: formData.adFormat
+        }
+      });
       
-      if (error) throw error;
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      console.log("Generated ad data:", data);
+      
+      // Set the generated image and text
+      setGeneratedImage(data.output_url);
+      setGeneratedText(data.description);
+      
+      // Save the project to Supabase if user is logged in
+      if (user) {
+        const { error: insertError } = await supabase
+          .from('ad_projects')
+          .insert([{
+            title: data.title,
+            description: data.description,
+            prompt: data.prompt,
+            target_audience: data.target_audience,
+            ad_format: data.ad_format,
+            status: "completed",
+            output_url: data.output_url,
+            thumbnail_url: data.thumbnail_url,
+            user_id: user.id
+          }]);
+          
+        if (insertError) {
+          console.error("Error saving ad project:", insertError);
+        }
+      }
       
       toast({
         title: "Ad generated successfully!",
@@ -82,12 +101,28 @@ const AdGenerator = () => {
       console.error("Error generating ad:", error);
       toast({
         title: "Generation failed",
-        description: "There was an error generating your ad. Please try again.",
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
         variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
     }
+  };
+  
+  const handleReset = () => {
+    setGeneratedImage(null);
+    setGeneratedText(null);
+    setFormData({
+      title: "",
+      description: "",
+      prompt: "",
+      targetAudience: "",
+      adFormat: "image"
+    });
+  };
+  
+  const handlePromptTemplate = (promptTemplate: string) => {
+    setFormData(prev => ({...prev, prompt: promptTemplate}));
   };
   
   return (
@@ -205,6 +240,14 @@ const AdGenerator = () => {
                     className="w-full max-w-2xl h-auto"
                   />
                 </div>
+                
+                {generatedText && (
+                  <div className="bg-gray-50 p-4 rounded-lg w-full mb-4">
+                    <h4 className="font-medium text-sm mb-2">AI Generated Description:</h4>
+                    <p className="text-sm text-gray-700">{generatedText}</p>
+                  </div>
+                )}
+                
                 <div className="flex space-x-4 w-full max-w-md justify-center">
                   <Button variant="outline">
                     Download
@@ -212,16 +255,7 @@ const AdGenerator = () => {
                   <Button>
                     Share
                   </Button>
-                  <Button variant="ghost" onClick={() => {
-                    setGeneratedImage(null);
-                    setFormData({
-                      title: "",
-                      description: "",
-                      prompt: "",
-                      targetAudience: "",
-                      adFormat: "image"
-                    });
-                  }}>
+                  <Button variant="ghost" onClick={handleReset}>
                     Create New
                   </Button>
                 </div>
@@ -333,13 +367,13 @@ const AdGenerator = () => {
                 </h4>
                 <p className="text-sm mt-2">Try these prompt starters:</p>
                 <ul className="mt-2 space-y-2 text-sm">
-                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => setFormData(prev => ({...prev, prompt: "Create a vibrant advertisement for handcrafted jewelry featuring traditional Indian designs with modern styling. Include rich colors and ornate patterns."}))}>
+                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => handlePromptTemplate("Create a vibrant advertisement for handcrafted jewelry featuring traditional Indian designs with modern styling. Include rich colors and ornate patterns.")}>
                     • Handcrafted jewelry ad with traditional designs
                   </li>
-                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => setFormData(prev => ({...prev, prompt: "Design a clean, minimalist advertisement for home decor items made from sustainable materials. Show the products in a contemporary living space with soft, natural lighting."}))}>
+                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => handlePromptTemplate("Design a clean, minimalist advertisement for home decor items made from sustainable materials. Show the products in a contemporary living space with soft, natural lighting.")}>
                     • Sustainable home decor with natural aesthetics
                   </li>
-                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => setFormData(prev => ({...prev, prompt: "Create a festive advertisement for handmade silk clothing with rich colors, highlighting the intricate embroidery and craftsmanship. Feature soft, flowing fabrics in a luxurious setting."}))}>
+                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => handlePromptTemplate("Create a festive advertisement for handmade silk clothing with rich colors, highlighting the intricate embroidery and craftsmanship. Feature soft, flowing fabrics in a luxurious setting.")}>
                     • Festive clothing with rich embroidery details
                   </li>
                 </ul>

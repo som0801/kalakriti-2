@@ -1,14 +1,24 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Upload, Video, Mic, Languages, Type, Share, Check, Sparkles, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 
 const VideoEnhancer = () => {
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [uploadStage, setUploadStage] = useState("upload"); // upload, enhancing, preview
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [generatedTitle, setGeneratedTitle] = useState("");
+  const [generatedDescription, setGeneratedDescription] = useState("");
+  
   const [languageOptions, setLanguageOptions] = useState([
     { name: "Hindi", selected: true },
     { name: "English", selected: true },
@@ -17,6 +27,7 @@ const VideoEnhancer = () => {
     { name: "Bengali", selected: false },
     { name: "Marathi", selected: false },
   ]);
+  
   const [enhancementOptions, setEnhancementOptions] = useState({
     videoQuality: true,
     audioClarity: true,
@@ -33,11 +44,6 @@ const VideoEnhancer = () => {
       const url = URL.createObjectURL(selectedFile);
       setPreviewUrl(url);
       setUploadStage("enhancing");
-      
-      // Simulate enhancement process
-      setTimeout(() => {
-        setUploadStage("preview");
-      }, 3000);
     }
   };
   
@@ -58,6 +64,105 @@ const VideoEnhancer = () => {
     setFile(null);
     setPreviewUrl(null);
     setUploadStage("upload");
+    setGeneratedTitle("");
+    setGeneratedDescription("");
+  };
+  
+  const handleEnhanceVideo = async () => {
+    if (!file) {
+      toast({
+        title: "No file selected",
+        description: "Please upload a video file first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setIsProcessing(true);
+      
+      // Get the selected languages
+      const selectedLanguages = languageOptions
+        .filter(lang => lang.selected)
+        .map(lang => lang.name);
+      
+      if (selectedLanguages.length === 0) {
+        toast({
+          title: "No languages selected",
+          description: "Please select at least one language for translation.",
+          variant: "destructive"
+        });
+        setIsProcessing(false);
+        return;
+      }
+      
+      // Prepare the video details
+      const videoDetails = {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        description: "Video uploaded for enhancement"
+      };
+      
+      // Call the Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('enhance-video', {
+        body: {
+          videoDetails,
+          enhancementOptions,
+          languages: selectedLanguages
+        }
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      console.log("Enhanced video data:", data);
+      
+      // Update the UI with the results
+      setGeneratedTitle(data.title || "Enhanced Video");
+      setGeneratedDescription(data.description || "Video enhanced successfully.");
+      
+      // Save to Supabase if user is logged in
+      if (user) {
+        await supabase
+          .from('video_projects')
+          .insert([{
+            title: data.title || "Enhanced Video",
+            description: data.description || "Video enhanced successfully.",
+            prompt: "Video enhancement",
+            status: "completed",
+            video_url: data.video_url,
+            thumbnail_url: data.thumbnail_url,
+            user_id: user.id
+          }]);
+      }
+      
+      toast({
+        title: "Video Enhanced Successfully",
+        description: "Your video has been enhanced with AI.",
+      });
+      
+      setUploadStage("preview");
+      
+    } catch (error) {
+      console.error("Error enhancing video:", error);
+      toast({
+        title: "Enhancement Failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setGeneratedTitle(e.target.value);
+  };
+  
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setGeneratedDescription(e.target.value);
   };
 
   return (
@@ -99,14 +204,40 @@ const VideoEnhancer = () => {
             
             {uploadStage === "enhancing" && (
               <div className="border-2 border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center h-80">
-                <Loader2 className="w-16 h-16 text-kala-primary mb-4 animate-spin" />
-                <h3 className="text-xl font-medium mb-2">Enhancing Your Video</h3>
-                <p className="text-gray-500 text-center mb-6">
-                  Our AI is working its magic. This may take a few minutes...
-                </p>
-                <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5">
-                  <div className="bg-kala-primary h-2.5 rounded-full w-2/3 animate-pulse"></div>
-                </div>
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-16 h-16 text-kala-primary mb-4 animate-spin" />
+                    <h3 className="text-xl font-medium mb-2">Enhancing Your Video</h3>
+                    <p className="text-gray-500 text-center mb-6">
+                      Our AI is working its magic. This may take a few minutes...
+                    </p>
+                    <div className="w-full max-w-md bg-gray-200 rounded-full h-2.5">
+                      <div className="bg-kala-primary h-2.5 rounded-full w-2/3 animate-pulse"></div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {previewUrl && (
+                      <video 
+                        className="w-full h-auto max-h-[240px] mb-4" 
+                        controls
+                        src={previewUrl}
+                      ></video>
+                    )}
+                    <h3 className="text-xl font-medium mb-2">Ready to Enhance</h3>
+                    <p className="text-gray-500 text-center mb-6">
+                      Click the button below to start the enhancement process
+                    </p>
+                    <Button 
+                      className="bg-kala-primary hover:bg-kala-secondary text-white"
+                      onClick={handleEnhanceVideo}
+                      disabled={isProcessing}
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Enhance Video
+                    </Button>
+                  </>
+                )}
               </div>
             )}
             
@@ -124,7 +255,8 @@ const VideoEnhancer = () => {
                     </Label>
                     <Input 
                       id="video-title" 
-                      placeholder="Beautiful Handmade Wooden Artifacts from Rajasthan" 
+                      value={generatedTitle}
+                      onChange={handleTitleChange}
                       className="mt-1" 
                     />
                   </div>
@@ -134,8 +266,9 @@ const VideoEnhancer = () => {
                     </Label>
                     <textarea 
                       id="video-description" 
+                      value={generatedDescription}
+                      onChange={handleDescriptionChange}
                       className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 h-24"
-                      placeholder="Discover the intricate beauty of traditional Rajasthani wooden handicrafts, meticulously carved by skilled artisans using techniques passed down through generations..."
                     ></textarea>
                   </div>
                   <div className="flex flex-wrap gap-2">
