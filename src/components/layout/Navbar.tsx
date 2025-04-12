@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Search, Upload, Users, User, Film, Image } from "lucide-react";
+import { Menu, X, Home, Search, Upload, Users, User, Film, Image, Video } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,6 +20,7 @@ const Navbar = () => {
     { name: "Home", path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
     { name: "Explore", path: "/explore", icon: <Search className="w-5 h-5 mr-2" /> },
     { name: "Video Enhancer", path: "/video-enhancer", icon: <Film className="w-5 h-5 mr-2" /> },
+    { name: "Video Generator", path: "/video-generator", icon: <Video className="w-5 h-5 mr-2" /> },
     { name: "Ad Generator", path: "/ad-generator", icon: <Image className="w-5 h-5 mr-2" /> },
     { name: "Community", path: "/community", icon: <Users className="w-5 h-5 mr-2" /> },
     { name: "Profile", path: "/profile", icon: <User className="w-5 h-5 mr-2" /> },
