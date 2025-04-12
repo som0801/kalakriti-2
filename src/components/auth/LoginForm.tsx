@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +6,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, isEmailConfirmed } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,14 +23,28 @@ const LoginForm = () => {
     
     const { error, success } = await signIn(email, password);
     
-    if (error) {
-      toast.error(error.message || "Login failed");
-    } else if (success) {
-      toast.success("Login successful!");
+    if (success) {
       navigate("/home");
     }
     
     setIsLoading(false);
+  };
+
+  const handleResendConfirmation = async () => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+      
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Confirmation email resent. Please check your inbox.");
+      }
+    } catch (error: any) {
+      toast.error("Failed to resend confirmation email");
+    }
   };
 
   return (
@@ -40,6 +56,22 @@ const LoginForm = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {!isEmailConfirmed && email && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Your email is not confirmed. Please check your inbox and confirm your email before logging in.
+              <Button 
+                variant="link" 
+                className="p-0 ml-2 text-red-700 underline" 
+                onClick={handleResendConfirmation}
+              >
+                Resend confirmation email
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
