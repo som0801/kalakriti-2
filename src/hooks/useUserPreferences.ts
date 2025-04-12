@@ -96,12 +96,15 @@ export const useUserPreferences = () => {
         throw new Error('No preferences found to update');
       }
 
+      // Convert Date objects to ISO strings for Supabase
+      const formattedUpdates = {
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
+
       const { data, error: updateError } = await supabase
         .from('user_preferences')
-        .update({
-          ...updates,
-          updated_at: new Date()
-        })
+        .update(formattedUpdates)
         .eq('id', preferences.id)
         .select()
         .single();

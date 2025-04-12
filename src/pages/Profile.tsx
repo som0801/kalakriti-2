@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -90,7 +89,7 @@ const Profile = () => {
           full_name: profileData.name,
           bio: profileData.bio,
           avatar_url: profileData.avatar_url,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
 

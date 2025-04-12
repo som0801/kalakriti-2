@@ -63,12 +63,15 @@ export const useProfile = () => {
         throw new Error('User not authenticated');
       }
 
+      // Convert Date objects to ISO strings for Supabase
+      const formattedUpdates = {
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
+
       const { data, error: updateError } = await supabase
         .from('profiles')
-        .update({
-          ...updates,
-          updated_at: new Date()
-        })
+        .update(formattedUpdates)
         .eq('id', user.id)
         .select()
         .single();
