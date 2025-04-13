@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -11,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Image, Layout, Target, MessageSquare, PenTool, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import BackButton from "@/components/ui/back-button";
 
 const AdGenerator = () => {
   const { toast } = useToast();
@@ -27,6 +27,8 @@ const AdGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [generatedText, setGeneratedText] = useState<string | null>(null);
+  const [userImage, setUserImage] = useState<File | null>(null);
+  const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -35,6 +37,20 @@ const AdGenerator = () => {
   
   const handleFormatChange = (value: string) => {
     setFormData(prev => ({ ...prev, adFormat: value }));
+  };
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setUserImage(file);
+      
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        setUserImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
   
   const handleGenerate = async () => {
@@ -50,15 +66,25 @@ const AdGenerator = () => {
     try {
       setIsGenerating(true);
       
+      // Prepare the request body
+      const requestBody: any = {
+        prompt: formData.prompt,
+        title: formData.title,
+        description: formData.description,
+        targetAudience: formData.targetAudience,
+        adFormat: formData.adFormat
+      };
+      
+      // If user uploaded an image, add it to the request
+      if (userImage) {
+        // In a real implementation, you would upload the image to storage
+        // and then pass the URL to the edge function
+        requestBody.userImageUrl = userImagePreview;
+      }
+      
       // Call the Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('generate-ad', {
-        body: {
-          prompt: formData.prompt,
-          title: formData.title,
-          description: formData.description,
-          targetAudience: formData.targetAudience,
-          adFormat: formData.adFormat
-        }
+        body: requestBody
       });
       
       if (error) {
@@ -112,6 +138,8 @@ const AdGenerator = () => {
   const handleReset = () => {
     setGeneratedImage(null);
     setGeneratedText(null);
+    setUserImage(null);
+    setUserImagePreview(null);
     setFormData({
       title: "",
       description: "",
@@ -127,9 +155,12 @@ const AdGenerator = () => {
   
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-kala-primary">AI Ad Generator</h1>
-        <p className="text-gray-600">Create stunning ads for your products with AI</p>
+      <div className="flex items-center mb-6">
+        <BackButton />
+        <div className="ml-2">
+          <h1 className="text-2xl font-bold text-kala-primary">AI Ad Generator</h1>
+          <p className="text-gray-600">Create stunning ads for your products with AI</p>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -161,6 +192,30 @@ const AdGenerator = () => {
                   value={formData.description}
                   onChange={handleInputChange}
                 />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="userImage">Upload Your Image (Optional)</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input 
+                    id="userImage" 
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="cursor-pointer"
+                  />
+                  
+                  {userImagePreview && (
+                    <div className="border rounded-md overflow-hidden">
+                      <img 
+                        src={userImagePreview} 
+                        alt="Your uploaded image" 
+                        className="w-full h-auto max-h-[150px] object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">Upload your product image to be included in the generated ad</p>
               </div>
               
               <div className="space-y-2">
