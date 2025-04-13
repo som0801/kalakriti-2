@@ -1,4 +1,5 @@
-
+import React from "react";
+import BackButton from "@/components/ui/back-button";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -166,10 +167,10 @@ const VideoEnhancer = () => {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-5xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-kala-primary">AI Video Enhancer</h1>
-        <p className="text-gray-600">Upload and enhance your product videos with AI</p>
+    <div className="container mx-auto py-8">
+      <div className="flex items-center mb-6 gap-4">
+        <BackButton />
+        <h1 className="text-2xl font-bold">Video Enhancer</h1>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
