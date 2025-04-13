@@ -1,0 +1,18 @@
+
+{
+  "appId": "app.lovable.cc230950cbea422e8c0820d33c6d1535",
+  "appName": "kala-kriti-connect-ai",
+  "server": {
+    "url": "https://cc230950-cbea-422e-8c08-20d33c6d1535.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#ffffffff",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP"
+    }
+  }
+}
