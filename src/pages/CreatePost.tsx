@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Image, MapPin, Users, Smile, Lock, Globe, TagIcon, Camera, X } from "lucide-react";
+import { Image, MapPin, Users, Smile, Lock, Globe, TagIcon, Camera, X, Plus } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";

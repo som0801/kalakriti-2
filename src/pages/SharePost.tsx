@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Copy, Facebook, Twitter, Instagram, Link2, Send, Share2, WhatsApp, Mail, QrCode, Users } from "lucide-react";
+import { Copy, Facebook, Twitter, Instagram, Link2, Send, Share2, MessageSquare, Mail, QrCode, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import BackButton from "@/components/ui/back-button";
@@ -140,7 +140,7 @@ const SharePost = () => {
                   { name: "Facebook", icon: Facebook, color: "bg-blue-100 text-blue-600" },
                   { name: "Instagram", icon: Instagram, color: "bg-purple-100 text-purple-600" },
                   { name: "Twitter", icon: Twitter, color: "bg-sky-100 text-sky-600" },
-                  { name: "WhatsApp", icon: WhatsApp, color: "bg-green-100 text-green-600" }
+                  { name: "MessageSquare", icon: MessageSquare, color: "bg-green-100 text-green-600" }
                 ].map((network) => (
                   <div 
                     key={network.name}
