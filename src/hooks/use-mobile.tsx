@@ -18,14 +18,18 @@ export function useIsMobile() {
       setIsMobile(window.innerWidth < BREAKPOINTS.MOBILE)
     }
     
-    // Add event listener for screen size changes
+    // Add event listener for screen size and orientation changes
     mql.addEventListener("change", onChange)
+    window.addEventListener("orientationchange", onChange)
     
     // Set initial value
     setIsMobile(window.innerWidth < BREAKPOINTS.MOBILE)
     
-    // Clean up event listener
-    return () => mql.removeEventListener("change", onChange)
+    // Clean up event listeners
+    return () => {
+      mql.removeEventListener("change", onChange)
+      window.removeEventListener("orientationchange", onChange)
+    }
   }, [])
 
   return !!isMobile

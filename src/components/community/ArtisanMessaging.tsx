@@ -155,16 +155,16 @@ const ArtisanMessaging = () => {
   };
 
   return (
-    <div className="grid md:grid-cols-3 gap-4 h-[500px] md:h-[600px]">
+    <div className="grid md:grid-cols-3 gap-2 md:gap-4 h-[calc(100vh-12rem)] md:h-[600px]">
       {(!isMobile || (isMobile && showContactsList)) && (
         <Card className="md:col-span-1 overflow-hidden">
-          <CardHeader className="px-3 md:px-4 py-2 md:py-3 space-y-2">
+          <CardHeader className="px-2 md:px-4 py-2 md:py-3 space-y-2">
             <h3 className="font-medium text-sm md:text-base">Artisan Connect</h3>
             <div className="relative">
-              <Search className="absolute left-2 top-2 md:top-3 h-3 w-3 md:h-4 md:w-4 text-gray-400" />
+              <Search className="absolute left-2 top-2.5 h-3 w-3 md:h-4 md:w-4 text-gray-400" />
               <Input 
                 placeholder="Search artisans..." 
-                className="pl-7 md:pl-8 text-xs md:text-sm h-7 md:h-10"
+                className="pl-7 md:pl-8 text-xs md:text-sm h-8 md:h-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

@@ -210,29 +210,29 @@ const Community = () => {
   };
 
   return (
-    <div className="container mx-auto py-4 px-2 md:py-8 md:px-4 max-w-6xl">
-      <div className="flex justify-between items-center mb-4 md:mb-6">
-        <div className="flex items-center gap-2 md:gap-4">
+    <div className="container mx-auto py-2 px-2 md:py-8 md:px-4 max-w-6xl">
+      <div className="flex justify-between items-center mb-3 md:mb-6">
+        <div className="flex items-center gap-2">
           <BackButton />
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-kala-primary">Community Hub</h1>
-            <p className="text-sm md:text-base text-gray-600">Connect with fellow artisans</p>
+            <h1 className="text-lg md:text-2xl font-bold text-kala-primary">Community Hub</h1>
+            <p className="text-xs md:text-base text-gray-600">Connect with fellow artisans</p>
           </div>
         </div>
         <Button 
-          className="bg-kala-primary hover:bg-kala-secondary text-xs md:text-sm h-8 md:h-10"
+          className="bg-kala-primary hover:bg-kala-secondary text-[10px] md:text-sm h-7 md:h-10 px-2 md:px-4"
           onClick={() => setIsPostModalOpen(true)}
         >
-          <Plus className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
+          <Plus className="mr-1 h-3 w-3 md:h-4 md:w-4" />
           <span className="hidden sm:inline">Create Post</span>
           <span className="sm:hidden">Post</span>
         </Button>
       </div>
       
-      <Tabs value={activeView} onValueChange={setActiveView} className="mb-4 md:mb-6">
-        <TabsList className="w-full max-w-md mx-auto grid grid-cols-2">
-          <TabsTrigger value="feed" className="text-xs md:text-sm py-1.5 md:py-2">Artisan Feed</TabsTrigger>
-          <TabsTrigger value="messaging" className="text-xs md:text-sm py-1.5 md:py-2">Artisan Connect</TabsTrigger>
+      <Tabs value={activeView} onValueChange={setActiveView} className="mb-3 md:mb-6">
+        <TabsList className="w-full max-w-md mx-auto grid grid-cols-2 h-8 md:h-10">
+          <TabsTrigger value="feed" className="text-[10px] md:text-sm py-1 md:py-2">Artisan Feed</TabsTrigger>
+          <TabsTrigger value="messaging" className="text-[10px] md:text-sm py-1 md:py-2">Artisan Connect</TabsTrigger>
         </TabsList>
         
         <TabsContent value="feed" className="mt-4 md:mt-6">
