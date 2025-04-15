@@ -1,3 +1,4 @@
+
 import React from "react";
 import BackButton from "@/components/ui/back-button";
 import { useState } from "react";
@@ -170,7 +171,7 @@ const VideoEnhancer = () => {
     <div className="container mx-auto py-8">
       <div className="flex items-center mb-6 gap-4">
         <BackButton />
-        <h1 className="text-2xl font-bold">Video Enhancer</h1>
+        <h1 className="text-2xl font-bold">Video Translator</h1> {/* Changed page title */}
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

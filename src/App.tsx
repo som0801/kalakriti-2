@@ -15,7 +15,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
-import VideoEnhancer from "./pages/VideoEnhancer";
+import VideoEnhancer from "./pages/VideoEnhancer"; // Keeping the file name the same
 import Community from "./pages/Community";
 import Explore from "./pages/Explore";
 import AdGenerator from "./pages/AdGenerator";
@@ -38,7 +38,7 @@ const AppRoutes = () => {
       <Route path="/create" element={<VideoEnhancer />} />
       <Route path="/community" element={<Community />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/video-enhancer" element={<VideoEnhancer />} />
+      <Route path="/video-enhancer" element={<VideoEnhancer />} /> {/* Kept the same route */}
       <Route path="/ad-generator" element={<AdGenerator />} />
       <Route path="/video-generator" element={<VideoGenerator />} />
       <Route path="/create-post" element={<CreatePost />} />

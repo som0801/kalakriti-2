@@ -9,8 +9,8 @@ const Home = () => {
   
   const features = [
     {
-      title: "AI Video Enhancer",
-      description: "Improve your videos with AI and add multilingual narration",
+      title: "Video Translator", // Changed from AI Video Enhancer
+      description: "Enhance and translate your videos with multilingual narration", // Updated description
       icon: <Film className="h-8 w-8 md:h-10 md:w-10 text-kala-primary" />,
       link: "/video-enhancer",
       color: "bg-purple-50",

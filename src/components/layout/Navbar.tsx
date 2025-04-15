@@ -22,7 +22,7 @@ const Navbar = () => {
   const navItems = [
     { name: "Home", path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
     { name: "Explore", path: "/explore", icon: <Search className="w-5 h-5 mr-2" /> },
-    { name: "Video Enhancer", path: "/video-enhancer", icon: <Film className="w-5 h-5 mr-2" /> },
+    { name: "Video Translator", path: "/video-enhancer", icon: <Film className="w-5 h-5 mr-2" /> }, // Changed name
     { name: "Video Generator", path: "/video-generator", icon: <Video className="w-5 h-5 mr-2" /> },
     { name: "Ad Generator", path: "/ad-generator", icon: <Image className="w-5 h-5 mr-2" /> },
     { name: "Community", path: "/community", icon: <Users className="w-5 h-5 mr-2" /> },
