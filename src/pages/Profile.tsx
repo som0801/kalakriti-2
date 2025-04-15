@@ -1,12 +1,19 @@
-
 import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, Save, User, Instagram, Facebook, Twitter, Link as LinkIcon, LogOut, Camera } from "lucide-react";
+import { Pencil, Save, User, Instagram, Facebook, Twitter, Link as LinkIcon, LogOut, Camera, MoreVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -139,7 +146,6 @@ const Profile = () => {
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}/${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-      // Upload the file to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
@@ -148,12 +154,10 @@ const Profile = () => {
         throw uploadError;
       }
 
-      // Get the public URL
       const { data } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
-      // Update the user's profile with the new avatar URL
       if (data) {
         setProfileData({
           ...profileData,
@@ -196,19 +200,37 @@ const Profile = () => {
             {isEditing ? <Save className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
             {isEditing ? t('save') : t('editProfile')}
           </Button>
-          <Button 
-            onClick={logout} 
-            variant="outline" 
-            className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
-          >
-            <LogOut className="h-4 w-4" />
-            {t('logout')}
-          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="h-9 w-9">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>{t('profileOptions')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={handleProfilePictureClick}
+                className="flex items-center cursor-pointer"
+              >
+                <Camera className="mr-2 h-4 w-4" />
+                <span>{t('changeProfilePicture')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={logout} 
+                className="flex items-center cursor-pointer text-red-600 hover:text-red-700"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>{t('logout')}</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Profile Card */}
         <Card className="md:col-span-1">
           <CardContent className="pt-6 flex flex-col items-center">
             <div className="relative">
@@ -309,7 +331,6 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Details Card */}
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>{t('artistDetails')}</CardTitle>
@@ -408,7 +429,6 @@ const Profile = () => {
           </CardContent>
         </Card>
 
-        {/* Portfolio Section */}
         <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle>{t('myPortfolio')}</CardTitle>
