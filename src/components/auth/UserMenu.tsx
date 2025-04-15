@@ -11,13 +11,15 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useLogout } from "@/hooks/useLogout";
 import { useProfile } from "@/hooks/useProfile";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings, LogOut, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 
 const UserMenu = () => {
   const { user } = useAuth();
   const { profile } = useProfile();
   const { logout } = useLogout();
+  const { t } = useLanguage();
 
   if (!user) return null;
 
@@ -42,7 +44,7 @@ const UserMenu = () => {
         <DropdownMenuItem asChild>
           <Link to="/profile" className="flex items-center cursor-pointer">
             <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span>{t('profile')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
@@ -54,7 +56,7 @@ const UserMenu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600">
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <span>{t('logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

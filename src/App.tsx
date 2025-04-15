@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import { AuthProvider } from "./context/AuthContext";
+import { LanguageProvider } from "./context/LanguageContext";
 
 // Pages
 import Index from "./pages/Index";
@@ -59,9 +60,11 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <AuthProvider>
-              <Layout>
-                <AppRoutes />
-              </Layout>
+              <LanguageProvider>
+                <Layout>
+                  <AppRoutes />
+                </Layout>
+              </LanguageProvider>
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>

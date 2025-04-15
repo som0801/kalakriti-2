@@ -2,14 +2,18 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Search, Upload, Users, User, Film, Image, Video } from "lucide-react";
+import { Menu, X, Home, Search, Upload, Users, User, Film, Image, Video, Globe } from "lucide-react";
 import Logo from "@/components/ui/logo";
 import { useIsMobile } from "@/hooks/use-mobile";
+import UserMenu from "@/components/auth/UserMenu";
+import LanguageSwitcher from "@/components/language/LanguageSwitcher";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -20,13 +24,13 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { name: "Home", path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
-    { name: "Explore", path: "/explore", icon: <Search className="w-5 h-5 mr-2" /> },
-    { name: "Video Translator", path: "/video-enhancer", icon: <Film className="w-5 h-5 mr-2" /> }, // Changed name
-    { name: "Video Generator", path: "/video-generator", icon: <Video className="w-5 h-5 mr-2" /> },
-    { name: "Ad Generator", path: "/ad-generator", icon: <Image className="w-5 h-5 mr-2" /> },
-    { name: "Community", path: "/community", icon: <Users className="w-5 h-5 mr-2" /> },
-    { name: "Profile", path: "/profile", icon: <User className="w-5 h-5 mr-2" /> },
+    { name: t('home'), path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
+    { name: t('explore'), path: "/explore", icon: <Search className="w-5 h-5 mr-2" /> },
+    { name: t('videoEnhancer'), path: "/video-enhancer", icon: <Film className="w-5 h-5 mr-2" /> },
+    { name: t('videoGenerator'), path: "/video-generator", icon: <Video className="w-5 h-5 mr-2" /> },
+    { name: t('adGenerator'), path: "/ad-generator", icon: <Image className="w-5 h-5 mr-2" /> },
+    { name: t('community'), path: "/community", icon: <Users className="w-5 h-5 mr-2" /> },
+    { name: t('profile'), path: "/profile", icon: <User className="w-5 h-5 mr-2" /> },
   ];
 
   return (
@@ -52,16 +56,20 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher />
+          <UserMenu />
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}
