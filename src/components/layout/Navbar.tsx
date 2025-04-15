@@ -3,10 +3,13 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Home, Search, Upload, Users, User, Film, Image, Video } from "lucide-react";
+import Logo from "@/components/ui/logo";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const isMobile = useIsMobile();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -27,22 +30,17 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-sm py-4 px-6 sticky top-0 z-50">
+    <nav className="bg-white shadow-sm py-2 md:py-4 px-3 md:px-6 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link to="/home" className="flex items-center">
-          <div className="text-2xl font-bold text-kala-primary">
-            <span className="text-kala-primary">Kala</span>
-            <span className="text-kala-accent">kriti</span>
-          </div>
-        </Link>
+        <Logo size={isMobile ? "small" : "medium"} withText={!isMobile} />
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex space-x-6 items-center">
+        <div className="hidden md:flex space-x-4 lg:space-x-6 items-center">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center px-3 py-2 rounded-full transition-colors ${
+              className={`flex items-center px-2 lg:px-3 py-2 rounded-full transition-colors ${
                 isActive(item.path)
                   ? "bg-kala-light text-kala-primary font-medium"
                   : "text-gray-600 hover:text-kala-primary hover:bg-gray-50"
@@ -68,13 +66,13 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-16 inset-x-0 bg-white shadow-md z-50 animate-fade-in">
-          <div className="container mx-auto py-3 px-6 flex flex-col space-y-2">
+        <div className="md:hidden fixed top-[50px] inset-x-0 bg-white shadow-md z-50 animate-fade-in max-h-[calc(100vh-50px)] overflow-y-auto">
+          <div className="container mx-auto py-2 px-4 flex flex-col space-y-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center px-4 py-3 rounded-md transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-md transition-colors ${
                   isActive(item.path)
                     ? "bg-kala-light text-kala-primary font-medium"
                     : "text-gray-600 hover:text-kala-primary hover:bg-gray-50"

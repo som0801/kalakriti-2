@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import Logo from "@/components/ui/logo";
 
 interface LayoutProps {
   children: ReactNode;
@@ -51,8 +52,9 @@ const Layout = ({ children }: LayoutProps) => {
   // Show loading state while checking auth
   if (loading || hasAuthParams) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+        <Logo size="medium" withText={false} />
+        <div className="flex flex-col items-center gap-2 mt-4">
           <Loader2 className="h-8 w-8 animate-spin text-kala-primary" />
           <p className="text-sm text-muted-foreground">Loading...</p>
         </div>

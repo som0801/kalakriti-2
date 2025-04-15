@@ -1,7 +1,8 @@
 
 {
   "appId": "app.lovable.cc230950cbea422e8c0820d33c6d1535",
-  "appName": "kala-kriti-connect-ai",
+  "appName": "Kalakriti",
+  "webDir": "dist",
   "server": {
     "url": "https://cc230950-cbea-422e-8c08-20d33c6d1535.lovableproject.com?forceHideBadge=true",
     "cleartext": true
@@ -10,9 +11,17 @@
     "SplashScreen": {
       "launchShowDuration": 3000,
       "launchAutoHide": true,
-      "backgroundColor": "#ffffffff",
+      "backgroundColor": "#ffffff",
       "androidSplashResourceName": "splash",
-      "androidScaleType": "CENTER_CROP"
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": true,
+      "spinnerColor": "#8B5CF6",
+      "androidSpinnerStyle": "large"
+    },
+    "StatusBar": {
+      "backgroundColor": "#ffffff",
+      "style": "dark",
+      "overlaysWebView": false
     }
   }
 }
