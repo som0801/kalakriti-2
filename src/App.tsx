@@ -39,7 +39,7 @@ const AppRoutes = () => {
       <Route path="/create" element={<VideoEnhancer />} />
       <Route path="/community" element={<Community />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/video-enhancer" element={<VideoEnhancer />} /> {/* Kept the same route */}
+      <Route path="/video-enhancer" element={<VideoEnhancer />} />
       <Route path="/ad-generator" element={<AdGenerator />} />
       <Route path="/video-generator" element={<VideoGenerator />} />
       <Route path="/create-post" element={<CreatePost />} />
@@ -53,23 +53,23 @@ const AppRoutes = () => {
 
 const App = () => {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AuthProvider>
-              <LanguageProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <React.StrictMode>
+          <AuthProvider>
+            <LanguageProvider>
+              <TooltipProvider>
                 <Layout>
                   <AppRoutes />
                 </Layout>
-              </LanguageProvider>
-            </AuthProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+                <Toaster />
+                <Sonner />
+              </TooltipProvider>
+            </LanguageProvider>
+          </AuthProvider>
+        </React.StrictMode>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
