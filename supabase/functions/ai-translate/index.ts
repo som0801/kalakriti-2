@@ -1,6 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { OpenAI } from "https://esm.sh/openai@4.35.4";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -38,24 +37,36 @@ serve(async (req) => {
       );
     }
 
-    const openai = new OpenAI({ apiKey: openAIApiKey });
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a professional translator. Translate the given text to ${targetLanguage}. Only return the translated text, no explanations or additional information.`
-        },
-        {
-          role: "user",
-          content: text
-        }
-      ],
-      max_tokens: 1000,
+    // Call OpenAI API directly without using the npm package
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional translator. Translate the given text to ${targetLanguage}. Only return the translated text, no explanations or additional information.`
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ],
+        max_tokens: 1000,
+      }),
     });
 
-    const translatedText = completion.choices[0].message.content?.trim() || text;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
+    }
+
+    const data = await response.json();
+    const translatedText = data.choices[0].message.content?.trim() || text;
 
     console.log(`Translated "${text}" to ${targetLanguage}: "${translatedText}"`);
     

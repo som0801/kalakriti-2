@@ -146,17 +146,16 @@ const Profile = () => {
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}/${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const avatarBucketExists = buckets?.some(bucket => bucket.name === 'avatars');
-      
-      if (!avatarBucketExists) {
-        await fetch(`${supabase.supabaseUrl}/functions/v1/init-storage`, {
+      try {
+        await fetch(`${import.meta.env.VITE_SUPABASE_URL || 'https://xihrtxeuuswsucyjetbu.supabase.co'}/functions/v1/init-storage`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabase.supabaseKey}`
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpaHJ0eGV1dXN3c3VjeWpldGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzOTQzMDUsImV4cCI6MjA1OTk3MDMwNX0.RWVY2iIgJbf95xYMN8mq6e919KYT7Hgf0WWPNAhBb6s'}`
           }
         });
+      } catch (error) {
+        console.error('Error calling init-storage function:', error);
       }
 
       const { error: uploadError } = await supabase.storage
