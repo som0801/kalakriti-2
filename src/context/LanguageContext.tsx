@@ -1,5 +1,6 @@
-
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export type Language = 'english' | 'hindi' | 'tamil' | 'telugu' | 'bengali' | 'marathi';
 
@@ -7,6 +8,8 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: string) => string;
+  translateWithAI: (text: string, targetLanguage: Language) => Promise<string>;
+  isTranslating: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -186,22 +189,95 @@ export const translations: Record<Language, Record<string, string>> = {
   }
 };
 
+// Cache for AI translations
+const translationCache: Record<string, Record<string, string>> = {};
+
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = localStorage.getItem('appLanguage');
     return (savedLanguage as Language) || 'english';
   });
+  const [isTranslating, setIsTranslating] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
 
-  const t = (key: string): string => {
-    return translations[language][key] || key;
-  };
+  // Function to translate text using AI
+  const translateWithAI = useCallback(async (text: string, targetLanguage: Language): Promise<string> => {
+    if (targetLanguage === 'english') return text;
+    
+    // Check cache first
+    const cacheKey = `${text}-${targetLanguage}`;
+    if (translationCache[language]?.[cacheKey]) {
+      return translationCache[language][cacheKey];
+    }
+
+    setIsTranslating(true);
+    try {
+      // Call the Supabase Edge Function for AI translation
+      const { data, error } = await supabase.functions.invoke('ai-translate', {
+        body: {
+          text,
+          targetLanguage: targetLanguage === 'english' ? 'English' : 
+                         targetLanguage === 'hindi' ? 'Hindi' :
+                         targetLanguage === 'tamil' ? 'Tamil' :
+                         targetLanguage === 'telugu' ? 'Telugu' :
+                         targetLanguage === 'bengali' ? 'Bengali' : 'Marathi'
+        }
+      });
+
+      if (error) {
+        console.error('Translation error:', error);
+        return text;
+      }
+
+      // Add to cache
+      if (!translationCache[language]) {
+        translationCache[language] = {};
+      }
+      translationCache[language][cacheKey] = data.translatedText;
+
+      return data.translatedText;
+    } catch (error) {
+      console.error('Error translating text:', error);
+      return text;
+    } finally {
+      setIsTranslating(false);
+    }
+  }, [language]);
+
+  const t = useCallback((key: string): string => {
+    // Get the translation for the key
+    const translatedText = translations[language][key];
+    
+    // If translation exists, return it
+    if (translatedText) {
+      return translatedText;
+    }
+    
+    // If no translation exists, return the key and queue an AI translation for future use
+    if (language !== 'english' && key) {
+      translateWithAI(key, language)
+        .then(aiTranslation => {
+          // Update our translation object with the AI translation for future use
+          if (!translations[language]) {
+            translations[language] = {};
+          }
+          translations[language][key] = aiTranslation;
+        })
+        .catch(error => {
+          console.error(`Failed to translate "${key}" to ${language}:`, error);
+        });
+    }
+    
+    // Return the original key as fallback
+    return key;
+  }, [language, translateWithAI]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, translateWithAI, isTranslating }}>
       {children}
     </LanguageContext.Provider>
   );

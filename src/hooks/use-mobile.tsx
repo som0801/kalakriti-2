@@ -9,7 +9,9 @@ export const BREAKPOINTS = {
 }
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const [isMobile, setIsMobile] = React.useState<boolean>(() => 
+    typeof window !== 'undefined' ? window.innerWidth < BREAKPOINTS.MOBILE : false
+  );
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${BREAKPOINTS.MOBILE - 1}px)`)
@@ -21,6 +23,7 @@ export function useIsMobile() {
     // Add event listener for screen size and orientation changes
     mql.addEventListener("change", onChange)
     window.addEventListener("orientationchange", onChange)
+    window.addEventListener("resize", onChange)
     
     // Set initial value
     setIsMobile(window.innerWidth < BREAKPOINTS.MOBILE)
@@ -29,10 +32,11 @@ export function useIsMobile() {
     return () => {
       mql.removeEventListener("change", onChange)
       window.removeEventListener("orientationchange", onChange)
+      window.removeEventListener("resize", onChange)
     }
   }, [])
 
-  return !!isMobile
+  return isMobile
 }
 
 export function useDeviceType() {
@@ -55,10 +59,32 @@ export function useDeviceType() {
     
     // Add event listener
     window.addEventListener('resize', handleResize)
+    window.addEventListener('orientationchange', handleResize)
     
     // Clean up
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('orientationchange', handleResize)
+    }
   }, [])
 
   return deviceType
+}
+
+// Add touch-specific detection
+export function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = React.useState<boolean>(false)
+  
+  React.useEffect(() => {
+    const isTouchDevice = () => {
+      return (('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        // @ts-ignore
+        (navigator.msMaxTouchPoints > 0))
+    }
+    
+    setIsTouch(isTouchDevice())
+  }, [])
+  
+  return isTouch
 }

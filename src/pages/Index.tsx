@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -9,7 +10,7 @@ const Index = () => {
       <div className="container px-4 py-12 md:py-16 mx-auto text-center">
         <div className="max-w-3xl mx-auto space-y-6 md:space-y-8 animate-fade-in">
           <div className="flex flex-col items-center">
-            <Logo size="large" withText={false} />
+            <Logo size="xlarge" withText={false} />
             <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-kala-dark mt-3">
               <span className="text-kala-primary">Kala</span>
               <span className="text-kala-accent">kriti</span>

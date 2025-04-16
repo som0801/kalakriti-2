@@ -36,7 +36,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-sm py-2 md:py-4 px-3 md:px-6 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Logo size={isMobile ? "small" : "medium"} withText={!isMobile} />
+        <Logo size={isMobile ? "medium" : "large"} withText={!isMobile} />
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-4 lg:space-x-6 items-center">

@@ -41,3 +41,6 @@ enabled = true
 
 [functions.translate-content]
 verify_jwt = true
+
+[functions.ai-translate]
+verify_jwt = true

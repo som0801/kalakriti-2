@@ -53,7 +53,7 @@ const Layout = ({ children }: LayoutProps) => {
   if (loading || hasAuthParams) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <Logo size="medium" withText={false} />
+        <Logo size="large" withText={false} />
         <div className="flex flex-col items-center gap-2 mt-4">
           <Loader2 className="h-8 w-8 animate-spin text-kala-primary" />
           <p className="text-sm text-muted-foreground">Loading...</p>
