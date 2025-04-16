@@ -24,6 +24,7 @@ import VideoGenerator from "./pages/VideoGenerator";
 import CreatePost from "./pages/CreatePost";
 import SharePost from "./pages/SharePost";
 import Tutorial from "./pages/Tutorial";
+import Translation from "./pages/Translation";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const AppRoutes = () => {
       <Route path="/create-post" element={<CreatePost />} />
       <Route path="/share-post" element={<SharePost />} />
       <Route path="/tutorial" element={<Tutorial />} />
+      <Route path="/translation" element={<Translation />} />
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
