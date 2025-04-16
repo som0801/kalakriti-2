@@ -65,7 +65,9 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {!isAuthPage && <Navbar />}
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow safe-area-inset-top safe-area-inset-bottom">
+        {children}
+      </main>
     </div>
   );
 };

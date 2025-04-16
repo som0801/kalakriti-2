@@ -11,7 +11,7 @@ const Logo = ({ size = "medium", withText = true }: LogoProps) => {
     small: "h-6 w-auto",
     medium: "h-10 w-auto",
     large: "h-16 w-auto",
-    xlarge: "h-24 w-auto" // New size for an extra large logo
+    xlarge: "h-24 w-auto" // Extra large logo
   };
 
   return (

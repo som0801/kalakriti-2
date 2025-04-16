@@ -30,7 +30,6 @@ const Navbar = () => {
     { name: t('videoGenerator'), path: "/video-generator", icon: <Video className="w-5 h-5 mr-2" /> },
     { name: t('adGenerator'), path: "/ad-generator", icon: <Image className="w-5 h-5 mr-2" /> },
     { name: t('community'), path: "/community", icon: <Users className="w-5 h-5 mr-2" /> },
-    
   ];
 
   return (

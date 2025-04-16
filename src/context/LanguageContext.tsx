@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -206,6 +207,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
 
   // Function to translate text using AI
   const translateWithAI = useCallback(async (text: string, targetLanguage: Language): Promise<string> => {
+    // If the target language is English, just return the original text
     if (targetLanguage === 'english') return text;
     
     // Check cache first
