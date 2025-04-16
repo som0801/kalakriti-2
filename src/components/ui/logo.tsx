@@ -8,10 +8,10 @@ interface LogoProps {
 
 const Logo = ({ size = "medium", withText = true }: LogoProps) => {
   const sizeClasses = {
-    small: "h-8 w-auto", // Increased from h-6
-    medium: "h-12 w-auto", // Increased from h-10
-    large: "h-20 w-auto", // Increased from h-16
-    xlarge: "h-28 w-auto" // Increased from h-24
+    small: "h-10 w-auto", // Increased from h-8
+    medium: "h-16 w-auto", // Increased from h-12
+    large: "h-24 w-auto", // Increased from h-20
+    xlarge: "h-32 w-auto" // Increased from h-28
   };
 
   return (
@@ -23,7 +23,7 @@ const Logo = ({ size = "medium", withText = true }: LogoProps) => {
           className={`${sizeClasses[size]}`}
         />
         {withText && (
-          <div className="hidden md:block text-2xl font-bold ml-2 text-kala-primary">
+          <div className="hidden md:block text-3xl font-bold ml-2 text-kala-primary">
             <span className="text-kala-primary">Kala</span>
             <span className="text-kala-accent">kriti</span>
           </div>

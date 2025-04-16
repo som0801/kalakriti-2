@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -8,14 +9,15 @@ import React, {
   useRef
 } from 'react';
 
+// Make sure Language type is exported
+export type Language = 'english' | 'hindi' | 'tamil' | 'telugu' | 'bengali' | 'marathi';
+
 interface LanguageContextType {
   language: string;
   setLanguage: (language: string) => void;
   t: (key: string) => string;
   isTranslating: boolean;
 }
-
-type Language = 'english' | 'hindi' | 'tamil' | 'telugu' | 'bengali' | 'marathi';
 
 interface Translation {
   [key: string]: {
@@ -230,8 +232,9 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined
 );
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Replace direct process.env access with import.meta.env for Vite
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<string>('english');
@@ -251,7 +254,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     try {
       setTranslating(true);
       
-      const response = await fetch(`${supabaseUrl}/functions/v1/ai-translate`, {
+      // Use direct URL if no environment variables are available
+      const apiUrl = supabaseUrl ? `${supabaseUrl}/functions/v1/ai-translate` : 'https://xihrtxeuuswsucyjetbu.supabase.co/functions/v1/ai-translate';
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
