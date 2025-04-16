@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 
 interface LogoProps {
-  size?: "small" | "medium" | "large";
+  size?: "small" | "medium" | "large" | "xlarge";
   withText?: boolean;
 }
 
@@ -11,6 +11,7 @@ const Logo = ({ size = "medium", withText = true }: LogoProps) => {
     small: "h-6 w-auto",
     medium: "h-10 w-auto",
     large: "h-16 w-auto",
+    xlarge: "h-24 w-auto" // New size for an extra large logo
   };
 
   return (
