@@ -146,11 +146,25 @@ const Profile = () => {
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}/${Math.random().toString(36).substring(2)}.${fileExt}`;
 
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const avatarBucketExists = buckets?.some(bucket => bucket.name === 'avatars');
+      
+      if (!avatarBucketExists) {
+        await fetch(`${supabase.supabaseUrl}/functions/v1/init-storage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabase.supabaseKey}`
+          }
+        });
+      }
+
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file);
 
       if (uploadError) {
+        console.error('Upload error:', uploadError);
         throw uploadError;
       }
 
@@ -173,13 +187,14 @@ const Profile = () => {
           .eq('id', user.id);
 
         if (updateError) {
+          console.error('Update error:', updateError);
           throw updateError;
         }
 
         toast.success('Profile picture updated successfully');
       }
     } catch (error: any) {
-      toast.error('Error uploading image');
+      toast.error('Error uploading image: ' + (error.message || 'Unknown error'));
       console.error('Error uploading image:', error);
     } finally {
       setUploading(false);

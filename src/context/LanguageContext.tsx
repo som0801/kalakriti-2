@@ -1,209 +1,242 @@
-
-import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-
-export type Language = 'english' | 'hindi' | 'tamil' | 'telugu' | 'bengali' | 'marathi';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef
+} from 'react';
 
 interface LanguageContextType {
-  language: Language;
-  setLanguage: (language: Language) => void;
+  language: string;
+  setLanguage: (language: string) => void;
   t: (key: string) => string;
-  translateWithAI: (text: string, targetLanguage: Language) => Promise<string>;
   isTranslating: boolean;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+type Language = 'english' | 'hindi' | 'tamil' | 'telugu' | 'bengali' | 'marathi';
 
-interface LanguageProviderProps {
-  children: ReactNode;
+interface Translation {
+  [key: string]: {
+    [language in Language]?: string;
+  };
 }
 
-export const translations: Record<Language, Record<string, string>> = {
-  english: {
-    home: 'Home',
-    explore: 'Explore',
-    videoEnhancer: 'Video Enhancer & Translator',
-    videoGenerator: 'Video Generator',
-    adGenerator: 'Ad Generator',
-    community: 'Community',
-    profile: 'Profile',
-    logout: 'Log out',
-    changeProfilePicture: 'Change Profile Picture',
-    save: 'Save',
-    language: 'Language',
-    welcomeToKalakriti: 'Welcome to Kalakriti',
-    artistProfile: 'Artist Profile',
-    editProfile: 'Edit Profile',
-    fullName: 'Full Name',
-    bio: 'Bio',
-    location: 'Location',
-    contactNumber: 'Contact Number',
-    email: 'Email',
-    preferredLanguage: 'Preferred Language',
-    artistDetails: 'Artist Details',
-    artworkType: 'Artwork Type',
-    experience: 'Experience Level',
-    myPortfolio: 'My Portfolio',
-    viewAllWork: 'View All Work',
-    skills: 'Skills'
+const defaultTranslations: Translation = {
+  "home": {
+    "english": "Home",
+    "hindi": "होम",
+    "tamil": "வீடு",
+    "telugu": "హోమ్",
+    "bengali": "হোম",
+    "marathi": "घर"
   },
-  hindi: {
-    home: 'होम',
-    explore: 'एक्सप्लोर',
-    videoEnhancer: 'वीडियो एनहांसर और अनुवादक',
-    videoGenerator: 'वीडियो जनरेटर',
-    adGenerator: 'एड जनरेटर',
-    community: 'समुदाय',
-    profile: 'प्रोफाइल',
-    logout: 'लॉग आउट',
-    changeProfilePicture: 'प्रोफाइल चित्र बदलें',
-    save: 'सेव करें',
-    language: 'भाषा',
-    welcomeToKalakriti: 'कलाकृति में आपका स्वागत है',
-    artistProfile: 'कलाकार प्रोफाइल',
-    editProfile: 'प्रोफाइल संपादित करें',
-    fullName: 'पूरा नाम',
-    bio: 'बायो',
-    location: 'स्थान',
-    contactNumber: 'संपर्क नंबर',
-    email: 'ईमेल',
-    preferredLanguage: 'पसंदीदा भाषा',
-    artistDetails: 'कलाकार विवरण',
-    artworkType: 'कला प्रकार',
-    experience: 'अनुभव स्तर',
-    myPortfolio: 'मेरा पोर्टफोलियो',
-    viewAllWork: 'सभी कार्य देखें',
-    skills: 'कौशल'
+  "explore": {
+    "english": "Explore",
+    "hindi": "एक्सप्लोर",
+    "tamil": "ஆராயுங்கள்",
+    "telugu": "అన్వేషించండి",
+    "bengali": "অনুসন্ধান",
+    "marathi": "एक्सप्लोर करा"
   },
-  tamil: {
-    home: 'முகப்பு',
-    explore: 'ஆராய்க',
-    videoEnhancer: 'வீடியோ மேம்படுத்தி மற்றும் மொழிபெயர்ப்பாளர்',
-    videoGenerator: 'வீடியோ உருவாக்கி',
-    adGenerator: 'விளம்பர உருவாக்கி',
-    community: 'சமூகம்',
-    profile: 'சுயவிவரம்',
-    logout: 'வெளியேறு',
-    changeProfilePicture: 'சுயவிவர படத்தை மாற்று',
-    save: 'சேமி',
-    language: 'மொழி',
-    welcomeToKalakriti: 'கலாகிருதிக்கு வரவேற்கிறோம்',
-    artistProfile: 'கலைஞர் சுயவிவரம்',
-    editProfile: 'சுயவிவரத்தைத் திருத்து',
-    fullName: 'முழு பெயர்',
-    bio: 'சுயவிவரம்',
-    location: 'இடம்',
-    contactNumber: 'தொடர்பு எண்',
-    email: 'மின்னஞ்சல்',
-    preferredLanguage: 'விருப்பமான மொழி',
-    artistDetails: 'கலைஞர் விவரங்கள்',
-    artworkType: 'கலைப்படைப்பு வகை',
-    experience: 'அனுபவ நிலை',
-    myPortfolio: 'எனது படைப்புகள்',
-    viewAllWork: 'அனைத்து வேலைகளையும் காண்க',
-    skills: 'திறன்கள்'
+  "videoEnhancer": {
+    "english": "Video Enhancer",
+    "hindi": "वीडियो एन्हांसर",
+    "tamil": "வீடியோ மேம்படுத்தி",
+    "telugu": "వీడియో మెరుగుపరచు",
+    "bengali": "ভিডিও বর্ধক",
+    "marathi": "व्हिडिओ वर्धक"
   },
-  telugu: {
-    home: 'హోమ్',
-    explore: 'అన్వేషించండి',
-    videoEnhancer: 'వీడియో ఎన్హాన్సర్ & అనువాదకుడు',
-    videoGenerator: 'వీడియో జనరేటర్',
-    adGenerator: 'యాడ్ జనరేటర్',
-    community: 'కమ్యూనిటీ',
-    profile: 'ప్రొఫైల్',
-    logout: 'లాగ్ అవుట్',
-    changeProfilePicture: 'ప్రొఫైల్ చిత్రాన్ని మార్చండి',
-    save: 'సేవ్ చేయండి',
-    language: 'భాష',
-    welcomeToKalakriti: 'కళాకృతికి స్వాగతం',
-    artistProfile: 'కళాకారుని ప్రొఫైల్',
-    editProfile: 'ప్రొఫైల్‌ని సవరించండి',
-    fullName: 'పూర్తి పేరు',
-    bio: 'బయో',
-    location: 'ప్రాంతం',
-    contactNumber: 'సంప్రదింపు నంబర్',
-    email: 'ఇమెయిల్',
-    preferredLanguage: 'ఇష్టమైన భాష',
-    artistDetails: 'కళాకారుని వివరాలు',
-    artworkType: 'కళా రకం',
-    experience: 'అనుభవ స్థాయి',
-    myPortfolio: 'నా పోర్ట్‌ఫోలియో',
-    viewAllWork: 'అన్ని పనులను చూడండి',
-    skills: 'నైపుణ్యాలు'
+  "videoGenerator": {
+    "english": "Video Generator",
+    "hindi": "वीडियो जेनरेटर",
+    "tamil": "வீடியோ ஜெனரேட்டர்",
+    "telugu": "వీడియో జనరేటర్",
+    "bengali": "ভিডিও জেনারেটর",
+    "marathi": "व्हिडिओ जनरेटर"
   },
-  bengali: {
-    home: 'হোম',
-    explore: 'এক্সপ্লোর',
-    videoEnhancer: 'ভিডিও এনহ্যান্সার এবং অনুবাদক',
-    videoGenerator: 'ভিডিও জেনারেটর',
-    adGenerator: 'অ্যাড জেনারেটর',
-    community: 'কমিউনিটি',
-    profile: 'প্রোফাইল',
-    logout: 'লগ আউট',
-    changeProfilePicture: 'প্রোফাইল ছবি পরিবর্তন করুন',
-    save: 'সংরক্ষণ করুন',
-    language: 'ভাষা',
-    welcomeToKalakriti: 'কলাকৃতিতে স্বাগতম',
-    artistProfile: 'শিল্পীর প্রোফাইল',
-    editProfile: 'প্রোফাইল সম্পাদনা করুন',
-    fullName: 'পুরো নাম',
-    bio: 'জীবনী',
-    location: 'অবস্থান',
-    contactNumber: 'যোগাযোগের নম্বর',
-    email: 'ইমেইল',
-    preferredLanguage: 'পছন্দের ভাষা',
-    artistDetails: 'শিল্পীর বিবরণ',
-    artworkType: 'শিল্পকর্মের ধরন',
-    experience: 'অভিজ্ঞতার স্তর',
-    myPortfolio: 'আমার পোর্টফোলিও',
-    viewAllWork: 'সমস্ত কাজ দেখুন',
-    skills: 'দক্ষতা'
+  "adGenerator": {
+    "english": "Ad Generator",
+    "hindi": "विज्ञापन जेनरेटर",
+    "tamil": "விளம்பர ஜெனரேட்டர்",
+    "telugu": "ప్రకటన జనరేటర్",
+    "bengali": "বিজ্ঞাপন জেনারেটর",
+    "marathi": "जाहिरात जनरेटर"
   },
-  marathi: {
-    home: 'होम',
-    explore: 'एक्सप्लोर',
-    videoEnhancer: 'व्हिडिओ एनहांसर आणि अनुवादक',
-    videoGenerator: 'व्हिडिओ जनरेटर',
-    adGenerator: 'अ‍ॅड जनरेटर',
-    community: 'कम्युनिटी',
-    profile: 'प्रोफाइल',
-    logout: 'लॉग आउट',
-    changeProfilePicture: 'प्रोफाइल फोटो बदला',
-    save: 'सेव्ह करा',
-    language: 'भाषा',
-    welcomeToKalakriti: 'कलाकृती मध्ये आपले स्वागत आहे',
-    artistProfile: 'कलाकाराची प्रोफाइल',
-    editProfile: 'प्रोफाइल संपादित करा',
-    fullName: 'पूर्ण नाव',
-    bio: 'बायो',
-    location: 'स्थान',
-    contactNumber: 'संपर्क क्रमांक',
-    email: 'ईमेल',
-    preferredLanguage: 'पसंतीची भाषा',
-    artistDetails: 'कलाकाराचे तपशील',
-    artworkType: 'कलाकृती प्रकार',
-    experience: 'अनुभव स्तर',
-    myPortfolio: 'माझे पोर्टफोलिओ',
-    viewAllWork: 'सर्व कामे पहा',
-    skills: 'कौशल्ये'
+  "community": {
+    "english": "Community",
+    "hindi": "समुदाय",
+    "tamil": "சமூகம்",
+    "telugu": "సంఘం",
+    "bengali": "সম্প্রদায়",
+    "marathi": "समुदाय"
+  },
+  "profile": {
+    "english": "Profile",
+    "hindi": "प्रोफ़ाइल",
+    "tamil": "சுயவிவரம்",
+    "telugu": "ప్రొఫైల్",
+    "bengali": "প্রোফাইল",
+    "marathi": "प्रोफाइल"
+  },
+  "logout": {
+    "english": "Logout",
+    "hindi": "लोग आउट",
+    "tamil": "வெளியேறு",
+    "telugu": "నిష్క్రమించు",
+    "bengali": "লগ আউট",
+    "marathi": "लॉग आउट"
+  },
+  "artistProfile": {
+    "english": "Artist Profile",
+    "hindi": "कलाकार प्रोफाइल",
+    "tamil": "கலைஞர் சுயவிவரம்",
+    "telugu": "కళాకారుడి ప్రొఫైల్",
+    "bengali": "শিল্পী প্রোফাইল",
+    "marathi": "कलाकार प्रोफाइल"
+  },
+  "editProfile": {
+    "english": "Edit Profile",
+    "hindi": "प्रोफ़ाइल संपादित करें",
+    "tamil": "சுயவிவரத்தை திருத்து",
+    "telugu": "ప్రొఫైల్‌ను సవరించండి",
+    "bengali": "প্রোফাইল সম্পাদনা করুন",
+    "marathi": "प्रोफाइल संपादित करा"
+  },
+  "save": {
+    "english": "Save",
+    "hindi": "सहेजें",
+    "tamil": "சேமிக்க",
+    "telugu": "సేవ్",
+    "bengali": "সংরক্ষণ",
+    "marathi": "जतन करा"
+  },
+  "profileOptions": {
+    "english": "Profile Options",
+    "hindi": "प्रोफ़ाइल विकल्प",
+    "tamil": "சுயவிவர விருப்பங்கள்",
+    "telugu": "ప్రొఫైల్ ఎంపికలు",
+    "bengali": "প্রোফাইল অপশন",
+    "marathi": "प्रोफाइल पर्याय"
+  },
+  "changeProfilePicture": {
+    "english": "Change Profile Picture",
+    "hindi": "प्रोफ़ाइल चित्र बदलें",
+    "tamil": "சுயவிவரப் படத்தை மாற்றுக",
+    "telugu": "ప్రొఫైల్ చిత్రాన్ని మార్చండి",
+    "bengali": "প্রোফাইল ছবি পরিবর্তন করুন",
+    "marathi": "प्रोफाइल चित्र बदला"
+  },
+  "fullName": {
+    "english": "Full Name",
+    "hindi": "पूरा नाम",
+    "tamil": "முழு பெயர்",
+    "telugu": "పూర్తి పేరు",
+    "bengali": "পুরো নাম",
+    "marathi": "पूर्ण नाव"
+  },
+  "artworkType": {
+    "english": "Artwork Type",
+    "hindi": "कलाकृति प्रकार",
+    "tamil": "கலைப்படைப்பு வகை",
+    "telugu": "కళాఖండం రకం",
+    "bengali": "শিল্পকর্মের প্রকার",
+    "marathi": "कलाकृती प्रकार"
+  },
+  "experience": {
+    "english": "Experience",
+    "hindi": "अनुभव",
+    "tamil": "அனுபவம்",
+    "telugu": "అనుభవం",
+    "bengali": "অভিজ্ঞতা",
+    "marathi": "अनुभव"
+  },
+  "artistDetails": {
+    "english": "Artist Details",
+    "hindi": "कलाकार विवरण",
+    "tamil": "கலைஞர் விவரங்கள்",
+    "telugu": "కళాకారుడి వివరాలు",
+    "bengali": "শিল্পী বিবরণ",
+    "marathi": "कलाकार तपशील"
+  },
+  "bio": {
+    "english": "Bio",
+    "hindi": "बायो",
+    "tamil": "சுயசரிதை",
+    "telugu": "బయో",
+    "bengali": "বায়ো",
+    "marathi": "बायो"
+  },
+  "location": {
+    "english": "Location",
+    "hindi": "स्थान",
+    "tamil": "இடம்",
+    "telugu": "స్థానం",
+    "bengali": "অবস্থান",
+    "marathi": "ठिकाण"
+  },
+  "contactNumber": {
+    "english": "Contact Number",
+    "hindi": "संपर्क नंबर",
+    "tamil": "தொடர்பு எண்",
+    "telugu": "సంప్రదింపు సంఖ్య",
+    "bengali": "যোগাযোগ নম্বর",
+    "marathi": "संपर्क क्रमांक"
+  },
+  "email": {
+    "english": "Email",
+    "hindi": "ईमेल",
+    "tamil": "மின்னஞ்சல்",
+    "telugu": "ఇమెయిల్",
+    "bengali": "ইমেইল",
+    "marathi": "ईमेल"
+  },
+  "preferredLanguage": {
+    "english": "Preferred Language",
+    "hindi": "पसंदीदा भाषा",
+    "tamil": "விருப்பமான மொழி",
+    "telugu": "ఇష్టమైన భాష",
+    "bengali": "পছন্দের ভাষা",
+    "marathi": "पसंतीची भाषा"
+  },
+  "skills": {
+    "english": "Skills",
+    "hindi": "कौशल",
+    "tamil": "திறன்கள்",
+    "telugu": "నైపుణ్యాలు",
+    "bengali": "দক্ষতা",
+    "marathi": "कौशल्ये"
+  },
+  "myPortfolio": {
+    "english": "My Portfolio",
+    "hindi": "मेरा पोर्टफोलियो",
+    "tamil": "எனது போர்ட்ஃபோலியோ",
+    "telugu": "నా పోర్ట్‌ఫోలియో",
+    "bengali": "আমার পোর্টফোলিও",
+    "marathi": "माझे पोर्टफोलिओ"
+  },
+  "viewAllWork": {
+    "english": "View All Work",
+    "hindi": "सभी काम देखें",
+    "tamil": "எல்லா வேலையையும் காட்டு",
+    "telugu": "అన్ని పనిని చూడండి",
+    "bengali": "সমস্ত কাজ দেখুন",
+    "marathi": "सर्व काम पहा"
   }
 };
 
-// Cache for AI translations
-const translationCache: Record<string, Record<string, string>> = {};
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
-export const LanguageProvider = ({ children }: LanguageProviderProps) => {
-  const [language, setLanguage] = useState<Language>(() => {
-    const savedLanguage = localStorage.getItem('appLanguage');
-    return (savedLanguage as Language) || 'english';
-  });
-  const [isTranslating, setIsTranslating] = useState(false);
-  const { toast } = useToast();
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  useEffect(() => {
-    localStorage.setItem('appLanguage', language);
-  }, [language]);
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  const [language, setLanguage] = useState<string>('english');
+  const [isTranslating, setTranslating] = useState(false);
+  const translationCache = useRef(new Map<string, string>()).current;
 
   // Function to translate text using AI
   const translateWithAI = useCallback(async (text: string, targetLanguage: Language): Promise<string> => {
@@ -211,75 +244,57 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
     if (targetLanguage === 'english') return text;
     
     // Check cache first
-    const cacheKey = `${text}-${targetLanguage}`;
-    if (translationCache[language]?.[cacheKey]) {
-      return translationCache[language][cacheKey];
-    }
+    const cacheKey = `${text}_${targetLanguage}`;
+    const cachedTranslation = translationCache.get(cacheKey);
+    if (cachedTranslation) return cachedTranslation;
 
-    setIsTranslating(true);
     try {
-      // Call the Supabase Edge Function for AI translation
-      const { data, error } = await supabase.functions.invoke('ai-translate', {
-        body: {
+      setTranslating(true);
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/ai-translate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`
+        },
+        body: JSON.stringify({
           text,
-          targetLanguage: targetLanguage === 'english' ? 'English' : 
-                         targetLanguage === 'hindi' ? 'Hindi' :
-                         targetLanguage === 'tamil' ? 'Tamil' :
-                         targetLanguage === 'telugu' ? 'Telugu' :
-                         targetLanguage === 'bengali' ? 'Bengali' : 'Marathi'
-        }
+          targetLanguage
+        })
       });
 
-      if (error) {
-        console.error('Translation error:', error);
-        return text;
+      if (!response.ok) {
+        throw new Error(`Translation failed: ${response.statusText}`);
       }
 
-      // Add to cache
-      if (!translationCache[language]) {
-        translationCache[language] = {};
-      }
-      translationCache[language][cacheKey] = data.translatedText;
+      const data = await response.json();
+      const translatedText = data.translatedText || text;
 
-      return data.translatedText;
+      // Cache the result
+      translationCache.set(cacheKey, translatedText);
+      return translatedText;
     } catch (error) {
-      console.error('Error translating text:', error);
-      return text;
+      console.error('Translation error:', error);
+      return text; // Return original text on error
     } finally {
-      setIsTranslating(false);
+      setTranslating(false);
     }
-  }, [language]);
+  }, [translationCache]);
 
   const t = useCallback((key: string): string => {
-    // Get the translation for the key
-    const translatedText = translations[language][key];
-    
-    // If translation exists, return it
-    if (translatedText) {
-      return translatedText;
-    }
-    
-    // If no translation exists, return the key and queue an AI translation for future use
-    if (language !== 'english' && key) {
-      translateWithAI(key, language)
-        .then(aiTranslation => {
-          // Update our translation object with the AI translation for future use
-          if (!translations[language]) {
-            translations[language] = {};
-          }
-          translations[language][key] = aiTranslation;
-        })
-        .catch(error => {
-          console.error(`Failed to translate "${key}" to ${language}:`, error);
-        });
-    }
-    
-    // Return the original key as fallback
-    return key;
-  }, [language, translateWithAI]);
+    const translation = defaultTranslations[key]?.[language as Language];
+    return translation !== undefined ? translation : key;
+  }, [language]);
+
+  const value = {
+    language,
+    setLanguage,
+    t,
+    isTranslating
+  };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, translateWithAI, isTranslating }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

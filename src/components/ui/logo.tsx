@@ -8,10 +8,10 @@ interface LogoProps {
 
 const Logo = ({ size = "medium", withText = true }: LogoProps) => {
   const sizeClasses = {
-    small: "h-6 w-auto",
-    medium: "h-10 w-auto",
-    large: "h-16 w-auto",
-    xlarge: "h-24 w-auto" // Extra large logo
+    small: "h-8 w-auto", // Increased from h-6
+    medium: "h-12 w-auto", // Increased from h-10
+    large: "h-20 w-auto", // Increased from h-16
+    xlarge: "h-28 w-auto" // Increased from h-24
   };
 
   return (
