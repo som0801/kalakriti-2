@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const SharePost = () => {
     sharedWith: "Shared with",
     sharedOn: "Shared on",
     linkCopied: "Link copied to clipboard",
+    linkCopiedDesc: "You can now paste the link anywhere to share this post",
     shareTo: "Share to",
     shareOptions: "Share Options",
     shareVia: "Share via",
@@ -53,7 +55,28 @@ const SharePost = () => {
     allowDownloads: "Allow downloads",
     showMyName: "Show my name",
     trackViews: "Track views",
-    comments: "Comments"
+    comments: "Comments",
+    likes: "Likes",
+    shareWith: "Share With",
+    shareDesc: "Choose how you want to share your creation",
+    social: "Social",
+    direct: "Direct",
+    email: "Email",
+    shareMessage: "Share Message",
+    addMessage: "Add a custom message (optional)",
+    copyLink: "Copy Link",
+    showQrCode: "Show QR Code",
+    shareWithContacts: "Share with Contacts",
+    recipientEmail: "Recipient Email",
+    enterEmail: "Enter recipient's email address",
+    message: "Message",
+    addAMessage: "Add a personal message (optional)",
+    cancel: "Cancel",
+    shareNow: "Share Now",
+    qrCode: "QR Code",
+    scanQrDesc: "Scan this QR code to view the post",
+    qrLinksTo: "QR code links to:",
+    postLinkCopy: "Copy Link"
   };
   
   const [content, setContent] = useState(defaultContent);
