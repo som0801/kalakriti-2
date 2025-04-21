@@ -43,7 +43,8 @@ const Home = () => {
         setContent(defaultContent);
       } else {
         const translatedContent = await translatePage(defaultContent);
-        setContent(translatedContent);
+        // Fix TypeScript error by ensuring correct type
+        setContent(translatedContent as typeof defaultContent);
       }
     };
     

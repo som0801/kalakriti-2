@@ -22,38 +22,38 @@ const SharePost = () => {
   const { language, translatePage } = useLanguage();
   
   const defaultContent = {
-    pageTitle: "Share Post",
-    pageSubtitle: "Share this craft with others",
-    defaultMessage: "Check out this amazing craft from the Kala community!",
-    emailRequired: "Email required",
-    emailRequiredDesc: "Please enter an email address to share.",
-    postShared: "Post shared successfully!",
+    pageTitle: "Share Your Creation",
+    pageSubtitle: "Let the world see your traditional craft",
+    defaultMessage: "Check out my traditional craft creation on Kalakriti!",
+    emailRequired: "Email Required",
+    emailRequiredDesc: "Please enter a valid email address to share this post",
+    postShared: "Post Shared!",
     sharedWith: "Shared with",
     sharedOn: "Shared on",
-    linkCopied: "Link copied!",
-    linkCopiedDesc: "Post link has been copied to clipboard.",
-    social: "Social",
-    direct: "Direct",
-    email: "Email",
-    shareWith: "Share With",
-    shareDesc: "Choose how you want to share this post",
-    shareMessage: "Share message (optional)",
-    addMessage: "Add a message with your share...",
-    copyLink: "Copy Link",
-    showQrCode: "Show QR Code",
-    shareWithContacts: "Share with Contacts",
-    recipientEmail: "Recipient Email",
-    enterEmail: "Enter email address",
-    message: "Message",
-    addAMessage: "Add a message...",
-    cancel: "Cancel",
-    shareNow: "Share Now",
-    qrCode: "QR Code",
-    scanQrDesc: "Scan this code to view the post",
-    qrLinksTo: "This QR code links directly to the post",
-    postLinkCopy: "Copy Post Link",
-    likes: "likes",
-    comments: "comments"
+    linkCopied: "Link copied to clipboard",
+    shareTo: "Share to",
+    shareOptions: "Share Options",
+    shareVia: "Share via",
+    shareDirectly: "Share directly using",
+    copySharableLink: "Copy sharable link",
+    downloadPost: "Download post as image",
+    sendAsMessage: "Send as message",
+    shareToWhatsapp: "Share to WhatsApp",
+    shareToFacebook: "Share to Facebook",
+    shareToTwitter: "Share to Twitter",
+    shareToInstagram: "Share to Instagram",
+    shareToEmail: "Share via Email",
+    shareToLinkedin: "Share to LinkedIn",
+    shareToTelegram: "Share to Telegram",
+    shareToSms: "Share via SMS",
+    shareSettings: "Share Settings",
+    allowComments: "Allow comments",
+    allowReposts: "Allow reposts",
+    makePublic: "Make public",
+    allowDownloads: "Allow downloads",
+    showMyName: "Show my name",
+    trackViews: "Track views",
+    comments: "Comments"
   };
   
   const [content, setContent] = useState(defaultContent);
@@ -64,7 +64,7 @@ const SharePost = () => {
         setContent(defaultContent);
       } else {
         const translatedContent = await translatePage(defaultContent);
-        setContent(translatedContent);
+        setContent(translatedContent as typeof defaultContent);
       }
     };
     

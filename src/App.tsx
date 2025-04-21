@@ -58,8 +58,8 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <React.StrictMode>
-          <AuthProvider>
-            <LanguageProvider>
+          <LanguageProvider>
+            <AuthProvider>
               <TooltipProvider>
                 <Layout>
                   <AppRoutes />
@@ -67,8 +67,8 @@ const App = () => {
                 <Toaster />
                 <Sonner />
               </TooltipProvider>
-            </LanguageProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </LanguageProvider>
         </React.StrictMode>
       </BrowserRouter>
     </QueryClientProvider>
