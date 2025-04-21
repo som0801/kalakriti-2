@@ -2,12 +2,13 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Search, Upload, Users, User, Film, Image, Video, Globe } from "lucide-react";
+import { Menu, X, Home, Search, Video, Image, Users, Globe } from "lucide-react";
 import Logo from "@/components/ui/logo";
 import { useIsMobile } from "@/hooks/use-mobile";
 import UserMenu from "@/components/auth/UserMenu";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import { useLanguage } from "@/context/LanguageContext";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,12 +25,11 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { name: t('home'), path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
-    { name: t('explore'), path: "/explore", icon: <Search className="w-5 h-5 mr-2" /> },
-    { name: t('videoEnhancer'), path: "/video-enhancer", icon: <Film className="w-5 h-5 mr-2" /> },
-    { name: t('videoGenerator'), path: "/video-generator", icon: <Video className="w-5 h-5 mr-2" /> },
-    { name: t('adGenerator'), path: "/ad-generator", icon: <Image className="w-5 h-5 mr-2" /> },
-    { name: t('community'), path: "/community", icon: <Users className="w-5 h-5 mr-2" /> },
+    { name: t('home'), path: "/home", icon: Home },
+    { name: t('explore'), path: "/explore", icon: Search },
+    { name: t('videoEnhancer'), path: "/video-enhancer", icon: Video },
+    { name: t('adGenerator'), path: "/ad-generator", icon: Image },
+    { name: t('community'), path: "/community", icon: Users },
   ];
 
   return (
@@ -43,14 +43,20 @@ const Navbar = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center px-2 lg:px-3 py-2 rounded-full transition-colors ${
+              className={cn(
+                "group flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-300",
                 isActive(item.path)
                   ? "bg-kala-light text-kala-primary font-medium"
-                  : "text-gray-600 hover:text-kala-primary hover:bg-gray-50"
-              }`}
+                  : "text-gray-600 hover:bg-gray-100 hover:text-kala-primary"
+              )}
             >
-              {item.icon}
-              {item.name}
+              <item.icon 
+                className={cn(
+                  "w-5 h-5 transition-transform duration-300",
+                  isActive(item.path) ? "scale-110" : "group-hover:scale-110"
+                )} 
+              />
+              <span>{item.name}</span>
             </Link>
           ))}
         </div>
@@ -79,14 +85,15 @@ const Navbar = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center px-3 py-3 rounded-md transition-colors ${
+                className={cn(
+                  "flex items-center gap-3 px-3 py-3 rounded-md transition-colors duration-300",
                   isActive(item.path)
                     ? "bg-kala-light text-kala-primary font-medium"
-                    : "text-gray-600 hover:text-kala-primary hover:bg-gray-50"
-                }`}
+                    : "text-gray-600 hover:bg-gray-50 hover:text-kala-primary"
+                )}
                 onClick={() => setIsMenuOpen(false)}
               >
-                {item.icon}
+                <item.icon className="w-5 h-5" />
                 {item.name}
               </Link>
             ))}
