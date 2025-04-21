@@ -1,7 +1,7 @@
 
 import React from "react";
 import BackButton from "@/components/ui/back-button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -10,16 +10,60 @@ import { Upload, Video, Mic, Languages, Type, Share, Check, Sparkles, Loader2 } 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 const VideoEnhancer = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { language, translatePage } = useLanguage();
   const [uploadStage, setUploadStage] = useState("upload"); // upload, enhancing, preview
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [generatedTitle, setGeneratedTitle] = useState("");
   const [generatedDescription, setGeneratedDescription] = useState("");
+  
+  // Define all page content in English (default language)
+  const defaultContent = {
+    title: "Video Enhancer & Translator",
+    description: "Enhance and translate your videos with multilingual narration",
+    uploadVideo: "Upload Video",
+    dragDrop: "Drag and drop your video here or click to browse",
+    enhanceVideo: "Enhance Video",
+    videoEnhancement: "Video Enhancement",
+    selectLanguages: "Select Languages for Translation",
+    enhancementOptions: "Enhancement Options",
+    videoQuality: "Improve Video Quality",
+    audioClarity: "Enhance Audio Clarity",
+    generateTitle: "Generate Title",
+    generateDescription: "Generate Description",
+    processing: "Processing...",
+    newUpload: "New Upload",
+    shareVideo: "Share Video",
+    downloadVideo: "Download Video",
+    previewVideo: "Preview Enhanced Video",
+    noFileSelected: "No file selected",
+    pleaseUpload: "Please upload a video file first.",
+    noLanguagesSelected: "No languages selected",
+    selectLanguageMessage: "Please select at least one language for translation."
+  };
+  
+  // State to hold translated content
+  const [content, setContent] = useState(defaultContent);
+  
+  // Translate UI when language changes
+  useEffect(() => {
+    const updateTranslations = async () => {
+      if (language === 'english') {
+        setContent(defaultContent);
+      } else {
+        const translatedContent = await translatePage(defaultContent);
+        setContent(translatedContent as typeof defaultContent);
+      }
+    };
+    
+    updateTranslations();
+  }, [language, translatePage]);
   
   const [languageOptions, setLanguageOptions] = useState([
     { name: "Hindi", selected: true },
@@ -171,7 +215,7 @@ const VideoEnhancer = () => {
     <div className="container mx-auto py-8">
       <div className="flex items-center mb-6 gap-4">
         <BackButton />
-        <h1 className="text-2xl font-bold">Video Enhancer & Translator</h1>
+        <h1 className="text-2xl font-bold">{content.title}</h1>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -181,9 +225,9 @@ const VideoEnhancer = () => {
             {uploadStage === "upload" && (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center h-80">
                 <Video className="w-16 h-16 text-kala-primary mb-4" />
-                <h3 className="text-xl font-medium mb-2">Upload Your Video</h3>
+                <h3 className="text-xl font-medium mb-2">{content.uploadVideo}</h3>
                 <p className="text-gray-500 text-center mb-6">
-                  Drag and drop your product video here or click to browse
+                  {content.dragDrop}
                 </p>
                 <Label htmlFor="video-upload" className="cursor-pointer">
                   <div className="bg-kala-primary hover:bg-kala-secondary text-white font-medium py-2 px-4 rounded-md flex items-center">
@@ -236,7 +280,7 @@ const VideoEnhancer = () => {
                       disabled={isProcessing}
                     >
                       <Sparkles className="w-4 h-4 mr-2" />
-                      Enhance Video
+                      {content.enhanceVideo}
                     </Button>
                   </>
                 )}
@@ -275,14 +319,14 @@ const VideoEnhancer = () => {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Button variant="outline" className="text-kala-primary border-kala-primary hover:bg-kala-light">
-                      Download Enhanced
+                      {content.downloadVideo}
                     </Button>
                     <Button className="bg-kala-primary hover:bg-kala-secondary">
                       <Share className="w-4 h-4 mr-2" />
-                      Share to Platforms
+                      {content.shareVideo}
                     </Button>
                     <Button variant="ghost" onClick={handleNewUpload}>
-                      Upload New Video
+                      {content.newUpload}
                     </Button>
                   </div>
                 </div>
@@ -294,7 +338,7 @@ const VideoEnhancer = () => {
         {/* Settings Card */}
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle>Enhancement Options</CardTitle>
+            <CardTitle>{content.enhancementOptions}</CardTitle>
             <CardDescription>Customize how AI enhances your video</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -315,10 +359,10 @@ const VideoEnhancer = () => {
                       {value && <Check className="w-3 h-3" />}
                     </button>
                     <span className="text-sm">
-                      {key === "videoQuality" ? "Enhance Video Quality" :
-                       key === "audioClarity" ? "Improve Audio Clarity" :
-                       key === "generateTitle" ? "Generate Catchy Title" :
-                       "Generate Description"}
+                      {key === "videoQuality" ? content.videoQuality :
+                       key === "audioClarity" ? content.audioClarity :
+                       key === "generateTitle" ? content.generateTitle :
+                       content.generateDescription}
                     </span>
                   </div>
                 ))}
