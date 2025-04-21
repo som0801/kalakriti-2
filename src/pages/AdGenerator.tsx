@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -9,59 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Image, Layout, Target, MessageSquare, PenTool, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/context/AuthContext";
-import BackButton from "@/components/ui/back-button";
-import { useLanguage } from "@/context/LanguageContext";
 
 const AdGenerator = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const { language, translatePage } = useLanguage();
-  
-  // Define all page content in English (default language)
-  const defaultContent = {
-    title: "AI Ad Generator",
-    description: "Create beautiful ad templates for your handicraft products",
-    generateAd: "Generate Ad",
-    adDetails: "Ad Details",
-    adTitle: "Ad Title",
-    adTitlePlaceholder: "Enter a title for your ad",
-    adDescription: "Ad Description",
-    adDescriptionPlaceholder: "Describe your product or service",
-    promptLabel: "Custom Prompt (Optional)",
-    promptPlaceholder: "Add specific details about what you want in the ad",
-    targetAudience: "Target Audience",
-    targetAudiencePlaceholder: "Who is this ad for?",
-    adFormat: "Ad Format",
-    imageFormat: "Image",
-    textFormat: "Text",
-    uploadImage: "Upload Image",
-    uploadImageDescription: "Upload an image of your product to include in the ad",
-    generating: "Generating...",
-    generatedAd: "Generated Ad",
-    regenerate: "Regenerate",
-    download: "Download",
-    share: "Share",
-    errorGenerating: "Error generating ad. Please try again.",
-    fillAllFields: "Please fill all required fields"
-  };
-  
-  // State to hold translated content
-  const [content, setContent] = useState(defaultContent);
-  
-  // Translate UI when language changes
-  useEffect(() => {
-    const updateTranslations = async () => {
-      if (language === 'english') {
-        setContent(defaultContent);
-      } else {
-        const translatedContent = await translatePage(defaultContent);
-        setContent(translatedContent as typeof defaultContent);
-      }
-    };
-    
-    updateTranslations();
-  }, [language, translatePage]);
   
   const [formData, setFormData] = useState({
     title: "",
@@ -73,9 +26,6 @@ const AdGenerator = () => {
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [generatedText, setGeneratedText] = useState<string | null>(null);
-  const [userImage, setUserImage] = useState<File | null>(null);
-  const [userImagePreview, setUserImagePreview] = useState<string | null>(null);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -86,27 +36,12 @@ const AdGenerator = () => {
     setFormData(prev => ({ ...prev, adFormat: value }));
   };
   
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setUserImage(file);
-      
-      // Create a preview URL
-      const reader = new FileReader();
-      reader.onload = () => {
-        setUserImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  
-  const handleGenerateAd = async () => {
-    // Validate form
-    if (!formData.title || !formData.description) {
+  const handleGenerate = async () => {
+    if (!formData.prompt) {
       toast({
-        title: "Error",
-        description: content.fillAllFields,
-        variant: "destructive",
+        title: "Missing information",
+        description: "Please enter a prompt to generate your ad.",
+        variant: "destructive"
       });
       return;
     }
@@ -114,58 +49,52 @@ const AdGenerator = () => {
     try {
       setIsGenerating(true);
       
-      // In a real app, this would call an API to generate the ad
-      // For demo purposes, we'll simulate a delay and return a placeholder
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Here we would normally call our AI generation API
+      // For now, let's simulate generation by waiting
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
-      if (formData.adFormat === "image") {
-        setGeneratedImage("https://placehold.co/600x400/8B5CF6/FFFFFF/png?text=AI+Generated+Ad");
-      } else {
-        setGeneratedText("This is a beautifully crafted handicraft item that showcases traditional artisanship with modern appeal. Perfect for home decor or as a thoughtful gift.");
-      }
+      // Mock generated image URL (in a real app, this would come from the API)
+      setGeneratedImage("https://placehold.co/600x400/8833ff/white?text=Generated+Ad");
+      
+      // Save the project to Supabase
+      const { data, error } = await supabase
+        .from('ad_projects')
+        .insert([{
+          title: formData.title || "Untitled Ad",
+          description: formData.description,
+          prompt: formData.prompt,
+          target_audience: formData.targetAudience,
+          ad_format: formData.adFormat,
+          status: "completed",
+          output_url: "https://placehold.co/600x400/8833ff/white?text=Generated+Ad",
+          thumbnail_url: "https://placehold.co/600x400/8833ff/white?text=Generated+Ad"
+        }])
+        .select();
+      
+      if (error) throw error;
       
       toast({
-        title: "Success",
-        description: "Your ad has been generated successfully!",
+        title: "Ad generated successfully!",
+        description: "Your ad has been created and saved to your projects.",
       });
+      
     } catch (error) {
       console.error("Error generating ad:", error);
       toast({
-        title: "Error",
-        description: content.errorGenerating,
-        variant: "destructive",
+        title: "Generation failed",
+        description: "There was an error generating your ad. Please try again.",
+        variant: "destructive"
       });
     } finally {
       setIsGenerating(false);
     }
   };
   
-  const handleReset = () => {
-    setGeneratedImage(null);
-    setGeneratedText(null);
-    setUserImage(null);
-    setUserImagePreview(null);
-    setFormData({
-      title: "",
-      description: "",
-      prompt: "",
-      targetAudience: "",
-      adFormat: "image"
-    });
-  };
-  
-  const handlePromptTemplate = (promptTemplate: string) => {
-    setFormData(prev => ({...prev, prompt: promptTemplate}));
-  };
-  
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <div className="flex items-center mb-6">
-        <BackButton />
-        <div className="ml-2">
-          <h1 className="text-2xl font-bold text-kala-primary">{content.title}</h1>
-          <p className="text-gray-600">{content.description}</p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-kala-primary">AI Ad Generator</h1>
+        <p className="text-gray-600">Create stunning ads for your products with AI</p>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -200,37 +129,13 @@ const AdGenerator = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="userImage">{content.uploadImage}</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Input 
-                    id="userImage" 
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="cursor-pointer"
-                  />
-                  
-                  {userImagePreview && (
-                    <div className="border rounded-md overflow-hidden">
-                      <img 
-                        src={userImagePreview} 
-                        alt="Your uploaded image" 
-                        className="w-full h-auto max-h-[150px] object-cover"
-                      />
-                    </div>
-                  )}
-                </div>
-                <p className="text-xs text-gray-500">{content.uploadImageDescription}</p>
-              </div>
-              
-              <div className="space-y-2">
                 <Label htmlFor="prompt" className="font-medium">
-                  {content.promptLabel} <span className="text-red-500">*</span>
+                  Create Prompt <span className="text-red-500">*</span>
                 </Label>
                 <Textarea 
                   id="prompt" 
                   name="prompt"
-                  placeholder={content.promptPlaceholder} 
+                  placeholder="Describe the ad you want to create in detail. E.g., A vibrant advertisement showcasing handcrafted artisan products from Rajasthan with traditional motifs and patterns, set against a desert backdrop." 
                   className="min-h-[120px]"
                   value={formData.prompt}
                   onChange={handleInputChange}
@@ -240,24 +145,24 @@ const AdGenerator = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="targetAudience">{content.targetAudience}</Label>
+                  <Label htmlFor="targetAudience">Target Audience</Label>
                   <Input 
                     id="targetAudience" 
                     name="targetAudience"
-                    placeholder={content.targetAudiencePlaceholder} 
+                    placeholder="E.g., Women 25-40, art enthusiasts" 
                     value={formData.targetAudience}
                     onChange={handleInputChange}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="adFormat">{content.adFormat}</Label>
+                  <Label htmlFor="adFormat">Ad Format</Label>
                   <Select value={formData.adFormat} onValueChange={handleFormatChange}>
                     <SelectTrigger id="adFormat">
                       <SelectValue placeholder="Select format" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="image">{content.imageFormat}</SelectItem>
+                      <SelectItem value="image">Static Image</SelectItem>
                       <SelectItem value="carousel">Image Carousel</SelectItem>
                       <SelectItem value="banner">Web Banner</SelectItem>
                       <SelectItem value="social">Social Media Post</SelectItem>
@@ -268,18 +173,18 @@ const AdGenerator = () => {
               
               <Button 
                 className="w-full mt-4" 
-                onClick={handleGenerateAd}
+                onClick={handleGenerate}
                 disabled={isGenerating || !formData.prompt}
               >
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {content.generating}
+                    Generating...
                   </>
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
-                    {content.generateAd}
+                    Generate Ad
                   </>
                 )}
               </Button>
@@ -289,7 +194,7 @@ const AdGenerator = () => {
           {generatedImage && (
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle>{content.generatedAd}</CardTitle>
+                <CardTitle>Generated Ad</CardTitle>
                 <CardDescription>Your AI-generated advertisement</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
@@ -300,14 +205,6 @@ const AdGenerator = () => {
                     className="w-full max-w-2xl h-auto"
                   />
                 </div>
-                
-                {generatedText && (
-                  <div className="bg-gray-50 p-4 rounded-lg w-full mb-4">
-                    <h4 className="font-medium text-sm mb-2">AI Generated Description:</h4>
-                    <p className="text-sm text-gray-700">{generatedText}</p>
-                  </div>
-                )}
-                
                 <div className="flex space-x-4 w-full max-w-md justify-center">
                   <Button variant="outline">
                     Download
@@ -315,7 +212,16 @@ const AdGenerator = () => {
                   <Button>
                     Share
                   </Button>
-                  <Button variant="ghost" onClick={handleReset}>
+                  <Button variant="ghost" onClick={() => {
+                    setGeneratedImage(null);
+                    setFormData({
+                      title: "",
+                      description: "",
+                      prompt: "",
+                      targetAudience: "",
+                      adFormat: "image"
+                    });
+                  }}>
                     Create New
                   </Button>
                 </div>
@@ -427,13 +333,13 @@ const AdGenerator = () => {
                 </h4>
                 <p className="text-sm mt-2">Try these prompt starters:</p>
                 <ul className="mt-2 space-y-2 text-sm">
-                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => handlePromptTemplate("Create a vibrant advertisement for handcrafted jewelry featuring traditional Indian designs with modern styling. Include rich colors and ornate patterns.")}>
+                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => setFormData(prev => ({...prev, prompt: "Create a vibrant advertisement for handcrafted jewelry featuring traditional Indian designs with modern styling. Include rich colors and ornate patterns."}))}>
                     • Handcrafted jewelry ad with traditional designs
                   </li>
-                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => handlePromptTemplate("Design a clean, minimalist advertisement for home decor items made from sustainable materials. Show the products in a contemporary living space with soft, natural lighting.")}>
+                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => setFormData(prev => ({...prev, prompt: "Design a clean, minimalist advertisement for home decor items made from sustainable materials. Show the products in a contemporary living space with soft, natural lighting."}))}>
                     • Sustainable home decor with natural aesthetics
                   </li>
-                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => handlePromptTemplate("Create a festive advertisement for handmade silk clothing with rich colors, highlighting the intricate embroidery and craftsmanship. Feature soft, flowing fabrics in a luxurious setting.")}>
+                  <li className="cursor-pointer hover:text-kala-primary" onClick={() => setFormData(prev => ({...prev, prompt: "Create a festive advertisement for handmade silk clothing with rich colors, highlighting the intricate embroidery and craftsmanship. Feature soft, flowing fabrics in a luxurious setting."}))}>
                     • Festive clothing with rich embroidery details
                   </li>
                 </ul>

@@ -2,19 +2,11 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Search, Video, Image, Users, Globe } from "lucide-react";
-import Logo from "@/components/ui/logo";
-import { useIsMobile } from "@/hooks/use-mobile";
-import UserMenu from "@/components/auth/UserMenu";
-import LanguageSwitcher from "@/components/language/LanguageSwitcher";
-import { useLanguage } from "@/context/LanguageContext";
-import { cn } from "@/lib/utils";
+import { Menu, X, Home, Search, Upload, Users, User, Film, Image } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
-  const isMobile = useIsMobile();
-  const { t } = useLanguage();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -25,75 +17,70 @@ const Navbar = () => {
   };
 
   const navItems = [
-    { name: t('home'), path: "/home", icon: Home },
-    { name: t('explore'), path: "/explore", icon: Search },
-    { name: t('videoEnhancer'), path: "/video-enhancer", icon: Video },
-    { name: t('adGenerator'), path: "/ad-generator", icon: Image },
-    { name: t('community'), path: "/community", icon: Users },
+    { name: "Home", path: "/home", icon: <Home className="w-5 h-5 mr-2" /> },
+    { name: "Explore", path: "/explore", icon: <Search className="w-5 h-5 mr-2" /> },
+    { name: "Video Enhancer", path: "/video-enhancer", icon: <Film className="w-5 h-5 mr-2" /> },
+    { name: "Ad Generator", path: "/ad-generator", icon: <Image className="w-5 h-5 mr-2" /> },
+    { name: "Community", path: "/community", icon: <Users className="w-5 h-5 mr-2" /> },
+    { name: "Profile", path: "/profile", icon: <User className="w-5 h-5 mr-2" /> },
   ];
 
   return (
-    <nav className="bg-white shadow-sm py-2 md:py-4 px-3 md:px-6 sticky top-0 z-50">
+    <nav className="bg-white shadow-sm py-4 px-6 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Logo size={isMobile ? "medium" : "large"} withText={!isMobile} />
+        <Link to="/home" className="flex items-center">
+          <div className="text-2xl font-bold text-kala-primary">
+            <span className="text-kala-primary">Kala</span>
+            <span className="text-kala-accent">kriti</span>
+          </div>
+        </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex space-x-4 lg:space-x-6 items-center">
+        <div className="hidden md:flex space-x-6 items-center">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={cn(
-                "group flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-300",
+              className={`flex items-center px-3 py-2 rounded-full transition-colors ${
                 isActive(item.path)
                   ? "bg-kala-light text-kala-primary font-medium"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-kala-primary"
-              )}
+                  : "text-gray-600 hover:text-kala-primary hover:bg-gray-50"
+              }`}
             >
-              <item.icon 
-                className={cn(
-                  "w-5 h-5 transition-transform duration-300",
-                  isActive(item.path) ? "scale-110" : "group-hover:scale-110"
-                )} 
-              />
-              <span>{item.name}</span>
+              {item.icon}
+              {item.name}
             </Link>
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
-          <UserMenu />
-          {/* Mobile Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </Button>
-        </div>
+        {/* Mobile Menu Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={toggleMenu}
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </Button>
       </div>
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden fixed top-[50px] inset-x-0 bg-white shadow-md z-50 animate-fade-in max-h-[calc(100vh-50px)] overflow-y-auto">
-          <div className="container mx-auto py-2 px-4 flex flex-col space-y-1">
+        <div className="md:hidden absolute top-16 inset-x-0 bg-white shadow-md z-50 animate-fade-in">
+          <div className="container mx-auto py-3 px-6 flex flex-col space-y-2">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-3 rounded-md transition-colors duration-300",
+                className={`flex items-center px-4 py-3 rounded-md transition-colors ${
                   isActive(item.path)
                     ? "bg-kala-light text-kala-primary font-medium"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-kala-primary"
-                )}
+                    : "text-gray-600 hover:text-kala-primary hover:bg-gray-50"
+                }`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                <item.icon className="w-5 h-5" />
+                {item.icon}
                 {item.name}
               </Link>
             ))}
