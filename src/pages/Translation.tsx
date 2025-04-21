@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";  // Add this import
 import BackButton from "@/components/ui/back-button";
 import { TranslationButton } from "@/components/ui/translation-button";
 import { TranslationCard } from "@/components/ui/translation-card";

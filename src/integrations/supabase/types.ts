@@ -54,6 +54,57 @@ export type Database = {
         }
         Relationships: []
       }
+      artisans: {
+        Row: {
+          address: string
+          bio: string
+          contact_info: string
+          created_at: string | null
+          handicraft_type: string
+          id: number
+          name: string
+          preferred_materials: string
+          product_pricing_range: string
+          production_capacity: number
+          shipping_capabilities: string
+          updated_at: string | null
+          user_id: string
+          years_of_experience: number
+        }
+        Insert: {
+          address: string
+          bio: string
+          contact_info: string
+          created_at?: string | null
+          handicraft_type: string
+          id?: never
+          name: string
+          preferred_materials: string
+          product_pricing_range: string
+          production_capacity: number
+          shipping_capabilities: string
+          updated_at?: string | null
+          user_id: string
+          years_of_experience: number
+        }
+        Update: {
+          address?: string
+          bio?: string
+          contact_info?: string
+          created_at?: string | null
+          handicraft_type?: string
+          id?: never
+          name?: string
+          preferred_materials?: string
+          product_pricing_range?: string
+          production_capacity?: number
+          shipping_capabilities?: string
+          updated_at?: string | null
+          user_id?: string
+          years_of_experience?: number
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -366,7 +417,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      enhance_video: {
+        Args: { video_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
