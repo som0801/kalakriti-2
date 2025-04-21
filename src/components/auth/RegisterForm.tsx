@@ -8,9 +8,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   
   // Basic form state
@@ -49,12 +52,47 @@ const RegisterForm = () => {
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      toast.success("Registration successful! Please check your email to verify your account.");
+    // Register with Supabase
+    const { error, success } = await signUp(
+      formData.email, 
+      formData.password,
+      formData.fullName
+    );
+    
+    if (error) {
+      toast.error(error.message || "Registration failed");
       setIsLoading(false);
-      navigate("/login");
-    }, 1500);
+      return;
+    }
+    
+    // Save additional profile information
+    const user = (await supabase.auth.getUser()).data.user;
+    
+    if (user) {
+      // Update profile with additional data
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          bio: formData.description,
+        })
+        .eq('id', user.id);
+      
+      // Save user preferences
+      const { error: prefError } = await supabase
+        .from('user_preferences')
+        .insert({
+          user_id: user.id,
+          default_languages: [formData.preferredLanguage],
+        });
+        
+      if (profileError || prefError) {
+        toast.error("Profile update failed, but account was created");
+      }
+    }
+    
+    toast.success("Registration successful! Please check your email to verify your account.");
+    setIsLoading(false);
+    navigate("/login");
   };
 
   const experienceLevels = [
