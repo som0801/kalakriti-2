@@ -13,9 +13,10 @@ import React, {
 export type Language = 'english' | 'hindi' | 'tamil' | 'telugu' | 'bengali' | 'marathi';
 
 interface LanguageContextType {
-  language: string;
-  setLanguage: (language: string) => void;
+  language: Language;
+  setLanguage: (language: Language) => void;
   t: (key: string) => string;
+  translateText: (text: string) => Promise<string>;
   isTranslating: boolean;
 }
 
@@ -237,9 +238,22 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<string>('english');
+  const [language, setLanguage] = useState<Language>('english');
   const [isTranslating, setTranslating] = useState(false);
   const translationCache = useRef(new Map<string, string>()).current;
+
+  // Load saved language preference from localStorage
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage && Object.values(Language).includes(savedLanguage as Language)) {
+      setLanguage(savedLanguage as Language);
+    }
+  }, []);
+
+  // Save language preference to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('preferredLanguage', language);
+  }, [language]);
 
   // Function to translate text using AI
   const translateWithAI = useCallback(async (text: string, targetLanguage: Language): Promise<string> => {
@@ -287,15 +301,23 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [translationCache]);
 
+  // Function to get translation from dictionary
   const t = useCallback((key: string): string => {
-    const translation = defaultTranslations[key]?.[language as Language];
+    const translation = defaultTranslations[key]?.[language];
     return translation !== undefined ? translation : key;
   }, [language]);
+
+  // Function to translate any text dynamically
+  const translateText = useCallback(async (text: string): Promise<string> => {
+    if (language === 'english') return text;
+    return await translateWithAI(text, language);
+  }, [language, translateWithAI]);
 
   const value = {
     language,
     setLanguage,
     t,
+    translateText,
     isTranslating
   };
 

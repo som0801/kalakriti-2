@@ -1,106 +1,135 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Languages, CornerDownLeft, Copy, Check } from "lucide-react";
+import { Languages } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
-import { TranslationButton } from "@/components/ui/translation-button";
-import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/context/LanguageContext";
+import { useToast } from "@/components/ui/use-toast";
 
 interface TranslationCardProps {
   originalText: string;
-  showControls?: boolean;
-  className?: string;
+  onTranslate?: (translatedText: string) => void;
 }
 
-export function TranslationCard({ 
-  originalText, 
-  showControls = true,
-  className = "" 
-}: TranslationCardProps) {
-  const [translatedText, setTranslatedText] = useState<string | null>(null);
-  const [language, setLanguage] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+export const TranslationCard = ({
+  originalText,
+  onTranslate
+}: TranslationCardProps) => {
+  const [isTranslated, setIsTranslated] = useState(false);
+  const [displayText, setDisplayText] = useState(originalText);
+  const { translate, loading } = useTranslation();
+  const { toast } = useToast();
+  const { language, translateText } = useLanguage();
   
-  const handleTranslated = (text: string, lang?: string) => {
-    setTranslatedText(text);
-    if (lang) setLanguage(lang);
-  };
-  
-  const handleCopy = async () => {
-    if (!translatedText) return;
+  const [buttonText, setButtonText] = useState({
+    translate: "Translate",
+    original: "Show Original"
+  });
+
+  useEffect(() => {
+    // Update button text based on language
+    const updateButtonText = async () => {
+      if (language === 'english') {
+        setButtonText({
+          translate: "Translate",
+          original: "Show Original"
+        });
+      } else {
+        const [translateBtn, originalBtn] = await Promise.all([
+          translateText("Translate"),
+          translateText("Show Original")
+        ]);
+        
+        setButtonText({
+          translate: translateBtn,
+          original: originalBtn
+        });
+      }
+    };
     
-    await navigator.clipboard.writeText(translatedText);
-    setCopied(true);
+    updateButtonText();
+  }, [language, translateText]);
+
+  // Auto-translate when language changes (except for English)
+  useEffect(() => {
+    const autoTranslate = async () => {
+      if (language !== 'english') {
+        if (!isTranslated) {
+          try {
+            const result = await translateText(originalText);
+            setDisplayText(result);
+            setIsTranslated(true);
+            if (onTranslate) {
+              onTranslate(result);
+            }
+          } catch (error) {
+            console.error("Auto-translation error:", error);
+            toast({
+              title: "Translation Error",
+              description: "Could not auto-translate text. Using original text instead.",
+              variant: "destructive"
+            });
+          }
+        }
+      } else {
+        // Reset to original text when language is English
+        setDisplayText(originalText);
+        setIsTranslated(false);
+      }
+    };
     
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  };
-  
-  const handleReset = () => {
-    setTranslatedText(null);
-    setLanguage(null);
+    autoTranslate();
+  }, [language, originalText, translateText]);
+
+  const handleToggle = async () => {
+    if (isTranslated) {
+      // Show original
+      setDisplayText(originalText);
+      setIsTranslated(false);
+    } else {
+      // Translate
+      try {
+        const result = await translate({
+          text: originalText,
+          targetLanguage: language
+        });
+        
+        if (result) {
+          setDisplayText(result);
+          setIsTranslated(true);
+          if (onTranslate) {
+            onTranslate(result);
+          }
+        }
+      } catch (error) {
+        console.error("Translation error:", error);
+        toast({
+          title: "Translation Error",
+          description: "Could not translate text. Please try again.",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   return (
-    <Card className={`overflow-hidden ${className}`}>
-      <CardContent className="p-4 space-y-4">
-        {translatedText ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Badge variant="outline" className="text-xs">
-                Translated to {language}
-              </Badge>
-              
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 w-8 p-0" 
-                onClick={handleCopy}
-              >
-                {copied ? (
-                  <Check className="h-4 w-4 text-green-500" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            
-            <div className="text-sm">
-              {translatedText}
-            </div>
-            
-            {showControls && (
-              <div className="flex justify-end pt-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-7 text-xs"
-                  onClick={handleReset}
-                >
-                  <CornerDownLeft className="h-3 w-3 mr-1" />
-                  Show Original
-                </Button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-sm">
-            {originalText}
-          </div>
-        )}
-      </CardContent>
-      
-      {showControls && !translatedText && (
-        <CardFooter className="px-4 py-2 bg-gray-50 flex justify-end">
-          <TranslationButton 
-            text={originalText}
-            onTranslated={(text) => handleTranslated(text)}
-            iconOnly={false}
-          />
-        </CardFooter>
-      )}
-    </Card>
+    <div className="bg-white p-4 rounded-md border">
+      <div className="mb-2 flex justify-between items-center">
+        <div className="text-sm font-medium text-gray-500">
+          {isTranslated ? language.charAt(0).toUpperCase() + language.slice(1) : "Original"}
+        </div>
+        <Button
+          onClick={handleToggle}
+          variant="outline"
+          size="sm"
+          className="text-xs h-8 px-2 flex items-center"
+          disabled={loading}
+        >
+          <Languages className="mr-1 h-3 w-3" />
+          {isTranslated ? buttonText.original : buttonText.translate}
+        </Button>
+      </div>
+      <p className="text-sm">{displayText}</p>
+    </div>
   );
-}
+};

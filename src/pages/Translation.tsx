@@ -1,14 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";  // Add this import
+import { Badge } from "@/components/ui/badge";
 import BackButton from "@/components/ui/back-button";
 import { TranslationButton } from "@/components/ui/translation-button";
 import { TranslationCard } from "@/components/ui/translation-card";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { useLanguage } from "@/context/LanguageContext";
 
 const samplePosts = [
   {
@@ -32,7 +33,69 @@ const TranslationPage = () => {
   const [inputText, setInputText] = useState("");
   const [translatedText, setTranslatedText] = useState<string | null>(null);
   const { preferences } = useUserPreferences();
+  const { language, t, translateText } = useLanguage();
   
+  const [pageTitle, setPageTitle] = useState("Translation Tool");
+  const [pageSubtitle, setPageSubtitle] = useState("Translate content to multiple languages");
+  const [tabTitles, setTabTitles] = useState({
+    tool: "Translation Tool",
+    examples: "Example Posts"
+  });
+  const [cardTexts, setCardTexts] = useState({
+    title: "Translate Text",
+    description: "Enter the text you want to translate and select the target language",
+    placeholder: "Enter text to translate...",
+    translatedLabel: "Translated Text:",
+    preferencesLabel: "Default languages from your preferences:"
+  });
+
+  // Translate the UI text when language changes
+  useEffect(() => {
+    const translateUI = async () => {
+      if (language === 'english') {
+        setPageTitle("Translation Tool");
+        setPageSubtitle("Translate content to multiple languages");
+        setTabTitles({
+          tool: "Translation Tool",
+          examples: "Example Posts"
+        });
+        setCardTexts({
+          title: "Translate Text",
+          description: "Enter the text you want to translate and select the target language",
+          placeholder: "Enter text to translate...",
+          translatedLabel: "Translated Text:",
+          preferencesLabel: "Default languages from your preferences:"
+        });
+      } else {
+        const translatedTitle = await translateText("Translation Tool");
+        const translatedSubtitle = await translateText("Translate content to multiple languages");
+        const translatedToolTab = await translateText("Translation Tool");
+        const translatedExamplesTab = await translateText("Example Posts");
+        const translatedCardTitle = await translateText("Translate Text");
+        const translatedCardDesc = await translateText("Enter the text you want to translate and select the target language");
+        const translatedPlaceholder = await translateText("Enter text to translate...");
+        const translatedLabel = await translateText("Translated Text:");
+        const translatedPrefLabel = await translateText("Default languages from your preferences:");
+
+        setPageTitle(translatedTitle);
+        setPageSubtitle(translatedSubtitle);
+        setTabTitles({
+          tool: translatedToolTab,
+          examples: translatedExamplesTab
+        });
+        setCardTexts({
+          title: translatedCardTitle,
+          description: translatedCardDesc,
+          placeholder: translatedPlaceholder,
+          translatedLabel: translatedLabel,
+          preferencesLabel: translatedPrefLabel
+        });
+      }
+    };
+
+    translateUI();
+  }, [language, translateText]);
+
   const handleTranslation = (result: string) => {
     setTranslatedText(result);
   };
@@ -42,29 +105,29 @@ const TranslationPage = () => {
       <div className="flex items-center mb-6">
         <BackButton />
         <div className="ml-2">
-          <h1 className="text-2xl font-bold text-kala-primary">Translation Tool</h1>
-          <p className="text-gray-600">Translate content to multiple languages</p>
+          <h1 className="text-2xl font-bold text-kala-primary">{pageTitle}</h1>
+          <p className="text-gray-600">{pageSubtitle}</p>
         </div>
       </div>
       
       <Tabs defaultValue="tool" className="w-full">
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-          <TabsTrigger value="tool">Translation Tool</TabsTrigger>
-          <TabsTrigger value="examples">Example Posts</TabsTrigger>
+          <TabsTrigger value="tool">{tabTitles.tool}</TabsTrigger>
+          <TabsTrigger value="examples">{tabTitles.examples}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tool" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Translate Text</CardTitle>
+              <CardTitle>{cardTexts.title}</CardTitle>
               <CardDescription>
-                Enter the text you want to translate and select the target language
+                {cardTexts.description}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Textarea 
-                  placeholder="Enter text to translate..." 
+                  placeholder={cardTexts.placeholder} 
                   className="min-h-[120px]"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
@@ -83,14 +146,14 @@ const TranslationPage = () => {
               {translatedText && (
                 <Card className="mt-4 bg-gray-50 border-gray-200">
                   <CardContent className="pt-4">
-                    <h3 className="text-sm font-medium mb-2">Translated Text:</h3>
+                    <h3 className="text-sm font-medium mb-2">{cardTexts.translatedLabel}</h3>
                     <p className="text-sm">{translatedText}</p>
                   </CardContent>
                 </Card>
               )}
               
               <div className="mt-4 text-xs text-gray-500">
-                <p>Default languages from your preferences:</p>
+                <p>{cardTexts.preferencesLabel}</p>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {preferences?.default_languages?.map((lang: string) => (
                     <Badge key={lang} variant="outline" className="text-xs">
