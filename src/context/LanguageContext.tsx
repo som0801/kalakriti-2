@@ -20,6 +20,8 @@ interface LanguageContextType {
   setLanguage: (language: Language) => void;
   t: (key: string) => string;
   translateText: (text: string) => Promise<string>;
+  batchTranslate: (texts: string[]) => Promise<string[]>;
+  translatePage: (pageContent: Record<string, string>) => Promise<Record<string, string>>;
   isTranslating: boolean;
 }
 
@@ -202,7 +204,7 @@ const defaultTranslations: Translation = {
     "english": "Preferred Language",
     "hindi": "पसंदीदा भाषा",
     "tamil": "விருப்பமான மொழி",
-    "telugu": "ఇష్టమైన భాష",
+    "telugu": "ఇష్టమైన భాష",
     "bengali": "পছন্দের ভাষা",
     "marathi": "पसंतीची भाषा"
   },
@@ -210,7 +212,7 @@ const defaultTranslations: Translation = {
     "english": "Skills",
     "hindi": "कौशल",
     "tamil": "திறன்கள்",
-    "telugu": "నైపుణ్యాలు",
+    "telugu": "నైపుణ్యాలు",
     "bengali": "দক্ষতা",
     "marathi": "कौशल्ये"
   },
@@ -243,7 +245,13 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('english');
   const [isTranslating, setTranslating] = useState(false);
+  
+  // Use two caches - one for single texts and one for batched translations
   const translationCache = useRef(new Map<string, string>()).current;
+  const batchTranslationCache = useRef(new Map<string, string[]>()).current;
+  
+  // Cache for entire page content translations
+  const pageTranslationCache = useRef(new Map<string, Record<string, string>>()).current;
 
   // Load saved language preference from localStorage
   useEffect(() => {
@@ -304,6 +312,58 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [translationCache]);
 
+  // Function to translate multiple text items in a single request
+  const batchTranslateWithAI = useCallback(async (texts: string[], targetLanguage: Language): Promise<string[]> => {
+    // If the target language is English or there are no texts, just return the original texts
+    if (targetLanguage === 'english' || texts.length === 0) return texts;
+    
+    // Generate a unique key for this batch
+    const cacheKey = `${texts.join('|')}_${targetLanguage}`;
+    const cachedTranslations = batchTranslationCache.get(cacheKey);
+    if (cachedTranslations) return cachedTranslations;
+
+    try {
+      setTranslating(true);
+      
+      const apiUrl = supabaseUrl ? `${supabaseUrl}/functions/v1/batch-translate` : 'https://xihrtxeuuswsucyjetbu.supabase.co/functions/v1/batch-translate';
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`
+        },
+        body: JSON.stringify({
+          texts,
+          targetLanguage
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Batch translation failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const translatedTexts = data.translatedTexts || texts;
+
+      // Cache the results (both the batch and individual translations)
+      batchTranslationCache.set(cacheKey, translatedTexts);
+      
+      // Also store in the single text cache for potential reuse
+      texts.forEach((text, index) => {
+        const singleCacheKey = `${text}_${targetLanguage}`;
+        translationCache.set(singleCacheKey, translatedTexts[index]);
+      });
+      
+      return translatedTexts;
+    } catch (error) {
+      console.error('Batch translation error:', error);
+      return texts; // Return original texts on error
+    } finally {
+      setTranslating(false);
+    }
+  }, [translationCache, batchTranslationCache]);
+
   // Function to get translation from dictionary
   const t = useCallback((key: string): string => {
     const translation = defaultTranslations[key]?.[language];
@@ -316,11 +376,51 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return await translateWithAI(text, language);
   }, [language, translateWithAI]);
 
+  // Function to translate an entire page's content in a single request
+  const translatePage = useCallback(async (pageContent: Record<string, string>): Promise<Record<string, string>> => {
+    if (language === 'english') return pageContent;
+    
+    // Create a cache key from the page content and language
+    const contentKeys = Object.keys(pageContent).sort();
+    const contentValues = contentKeys.map(key => pageContent[key]);
+    const cacheKey = `${contentValues.join('|')}_${language}`;
+    
+    // Check if we have this page content cached
+    const cachedPageTranslation = pageTranslationCache.get(cacheKey);
+    if (cachedPageTranslation) return cachedPageTranslation;
+    
+    try {
+      setTranslating(true);
+      
+      // Convert the page content to an array for batch translation
+      const textsToTranslate = contentValues;
+      const translatedTexts = await batchTranslateWithAI(textsToTranslate, language);
+      
+      // Reconstruct the page content with translations
+      const translatedPageContent: Record<string, string> = {};
+      contentKeys.forEach((key, index) => {
+        translatedPageContent[key] = translatedTexts[index];
+      });
+      
+      // Cache the translated page content
+      pageTranslationCache.set(cacheKey, translatedPageContent);
+      
+      return translatedPageContent;
+    } catch (error) {
+      console.error('Page translation error:', error);
+      return pageContent; // Return original content on error
+    } finally {
+      setTranslating(false);
+    }
+  }, [language, batchTranslateWithAI, pageTranslationCache]);
+
   const value = {
     language,
     setLanguage,
     t,
     translateText,
+    batchTranslate: (texts: string[]) => batchTranslateWithAI(texts, language),
+    translatePage,
     isTranslating
   };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,17 +13,73 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import BackButton from "@/components/ui/back-button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLanguage } from "@/context/LanguageContext";
 
 const SharePost = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { language, translatePage } = useLanguage();
+  
+  const defaultContent = {
+    pageTitle: "Share Post",
+    pageSubtitle: "Share this craft with others",
+    defaultMessage: "Check out this amazing craft from the Kala community!",
+    emailRequired: "Email required",
+    emailRequiredDesc: "Please enter an email address to share.",
+    postShared: "Post shared successfully!",
+    sharedWith: "Shared with",
+    sharedOn: "Shared on",
+    linkCopied: "Link copied!",
+    linkCopiedDesc: "Post link has been copied to clipboard.",
+    social: "Social",
+    direct: "Direct",
+    email: "Email",
+    shareWith: "Share With",
+    shareDesc: "Choose how you want to share this post",
+    shareMessage: "Share message (optional)",
+    addMessage: "Add a message with your share...",
+    copyLink: "Copy Link",
+    showQrCode: "Show QR Code",
+    shareWithContacts: "Share with Contacts",
+    recipientEmail: "Recipient Email",
+    enterEmail: "Enter email address",
+    message: "Message",
+    addAMessage: "Add a message...",
+    cancel: "Cancel",
+    shareNow: "Share Now",
+    qrCode: "QR Code",
+    scanQrDesc: "Scan this code to view the post",
+    qrLinksTo: "This QR code links directly to the post",
+    postLinkCopy: "Copy Post Link",
+    likes: "likes",
+    comments: "comments"
+  };
+  
+  const [content, setContent] = useState(defaultContent);
+  
+  useEffect(() => {
+    const updateTranslations = async () => {
+      if (language === 'english') {
+        setContent(defaultContent);
+      } else {
+        const translatedContent = await translatePage(defaultContent);
+        setContent(translatedContent);
+      }
+    };
+    
+    updateTranslations();
+  }, [language, translatePage]);
   
   const [shareMode, setShareMode] = useState("social");
   const [emailAddress, setEmailAddress] = useState("");
-  const [message, setMessage] = useState("Check out this amazing craft from the Kala community!");
+  const [message, setMessage] = useState(content.defaultMessage);
   const [selectedNetworks, setSelectedNetworks] = useState<string[]>([]);
   const [showQrCode, setShowQrCode] = useState(false);
+  
+  useEffect(() => {
+    setMessage(content.defaultMessage);
+  }, [content.defaultMessage]);
   
   const dummyPost = {
     id: 123,
@@ -52,19 +107,18 @@ const SharePost = () => {
   const handleShare = () => {
     if (shareMode === "email" && !emailAddress) {
       toast({
-        title: "Email required",
-        description: "Please enter an email address to share.",
+        title: content.emailRequired,
+        description: content.emailRequiredDesc,
         variant: "destructive"
       });
       return;
     }
     
-    // This would actually share the post in a real app
     toast({
-      title: "Post shared successfully!",
+      title: content.postShared,
       description: shareMode === "email" 
-        ? `Shared with ${emailAddress}` 
-        : `Shared on ${selectedNetworks.join(", ")}`
+        ? `${content.sharedWith} ${emailAddress}` 
+        : `${content.sharedOn} ${selectedNetworks.join(", ")}`
     });
     
     navigate("/community");
@@ -73,12 +127,11 @@ const SharePost = () => {
   const handleCopyLink = () => {
     navigator.clipboard.writeText(postLink);
     toast({
-      title: "Link copied!",
-      description: "Post link has been copied to clipboard."
+      title: content.linkCopied,
+      description: content.linkCopiedDesc
     });
   };
-  
-  // Add viewport meta tag to ensure proper mobile display
+
   useEffect(() => {
     const metaViewport = document.querySelector('meta[name="viewport"]');
     if (!metaViewport) {
@@ -94,8 +147,8 @@ const SharePost = () => {
       <div className="flex items-center mb-4 md:mb-6">
         <BackButton />
         <div className="ml-2">
-          <h1 className="text-xl md:text-2xl font-bold text-kala-primary">Share Post</h1>
-          <p className="text-sm md:text-base text-gray-600">Share this craft with others</p>
+          <h1 className="text-xl md:text-2xl font-bold text-kala-primary">{content.pageTitle}</h1>
+          <p className="text-sm md:text-base text-gray-600">{content.pageSubtitle}</p>
         </div>
       </div>
       
@@ -124,8 +177,8 @@ const SharePost = () => {
             />
             
             <div className="flex justify-between text-xs md:text-sm text-gray-500">
-              <div>{dummyPost.likes} likes</div>
-              <div>{dummyPost.comments} comments</div>
+              <div>{dummyPost.likes} {content.likes}</div>
+              <div>{dummyPost.comments} {content.comments}</div>
             </div>
           </CardContent>
         </Card>
@@ -133,16 +186,16 @@ const SharePost = () => {
       
       <Card className="border-kala-light shadow-sm">
         <CardHeader className="pb-0 pt-4 px-4">
-          <CardTitle className="text-lg md:text-xl">Share With</CardTitle>
-          <CardDescription className="text-xs md:text-sm">Choose how you want to share this post</CardDescription>
+          <CardTitle className="text-lg md:text-xl">{content.shareWith}</CardTitle>
+          <CardDescription className="text-xs md:text-sm">{content.shareDesc}</CardDescription>
         </CardHeader>
         
         <Tabs value={shareMode} onValueChange={setShareMode}>
           <CardContent className="pb-0 px-3 md:px-6">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="social" className="text-xs md:text-sm">Social</TabsTrigger>
-              <TabsTrigger value="direct" className="text-xs md:text-sm">Direct</TabsTrigger>
-              <TabsTrigger value="email" className="text-xs md:text-sm">Email</TabsTrigger>
+              <TabsTrigger value="social" className="text-xs md:text-sm">{content.social}</TabsTrigger>
+              <TabsTrigger value="direct" className="text-xs md:text-sm">{content.direct}</TabsTrigger>
+              <TabsTrigger value="email" className="text-xs md:text-sm">{content.email}</TabsTrigger>
             </TabsList>
           </CardContent>
           
@@ -180,9 +233,9 @@ const SharePost = () => {
               </div>
               
               <div>
-                <div className="font-medium text-xs md:text-sm mb-1 md:mb-2">Share message (optional)</div>
+                <div className="font-medium text-xs md:text-sm mb-1 md:mb-2">{content.shareMessage}</div>
                 <Textarea 
-                  placeholder="Add a message with your share..." 
+                  placeholder={content.addMessage}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="resize-none text-sm"
@@ -196,17 +249,17 @@ const SharePost = () => {
               <div className="flex flex-col space-y-2 md:space-y-3">
                 <Button variant="outline" className="justify-start text-xs md:text-sm h-9 md:h-10" onClick={handleCopyLink}>
                   <Copy className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                  Copy Link
+                  {content.copyLink}
                 </Button>
                 
                 <Button variant="outline" className="justify-start text-xs md:text-sm h-9 md:h-10" onClick={() => setShowQrCode(true)}>
                   <QrCode className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                  Show QR Code
+                  {content.showQrCode}
                 </Button>
                 
                 <Button variant="outline" className="justify-start text-xs md:text-sm h-9 md:h-10">
                   <Users className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                  Share with Contacts
+                  {content.shareWithContacts}
                 </Button>
               </div>
               
@@ -228,10 +281,10 @@ const SharePost = () => {
           <TabsContent value="email">
             <CardContent className="space-y-3 md:space-y-4 pt-4 px-3 md:px-6">
               <div className="space-y-1 md:space-y-2">
-                <div className="font-medium text-xs md:text-sm">Recipient Email</div>
+                <div className="font-medium text-xs md:text-sm">{content.recipientEmail}</div>
                 <Input 
                   type="email" 
-                  placeholder="Enter email address" 
+                  placeholder={content.enterEmail}
                   value={emailAddress}
                   onChange={(e) => setEmailAddress(e.target.value)}
                   className="text-sm"
@@ -239,9 +292,9 @@ const SharePost = () => {
               </div>
               
               <div className="space-y-1 md:space-y-2">
-                <div className="font-medium text-xs md:text-sm">Message</div>
+                <div className="font-medium text-xs md:text-sm">{content.message}</div>
                 <Textarea 
-                  placeholder="Add a message..." 
+                  placeholder={content.addAMessage}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   className="min-h-[80px] md:min-h-[100px] text-sm"
@@ -254,13 +307,13 @@ const SharePost = () => {
         <CardFooter className="justify-between p-3 md:p-4">
           <Button variant="outline" onClick={() => navigate("/community")} 
                  className="text-xs md:text-sm h-8 md:h-10">
-            Cancel
+            {content.cancel}
           </Button>
           <Button onClick={handleShare} 
                  disabled={(shareMode === "social" && selectedNetworks.length === 0) || (shareMode === "email" && !emailAddress)}
                  className="text-xs md:text-sm h-8 md:h-10">
             <Share2 className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-            Share Now
+            {content.shareNow}
           </Button>
         </CardFooter>
       </Card>
@@ -268,9 +321,9 @@ const SharePost = () => {
       <Dialog open={showQrCode} onOpenChange={setShowQrCode}>
         <DialogContent className="sm:max-w-[325px] md:sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>QR Code</DialogTitle>
+            <DialogTitle>{content.qrCode}</DialogTitle>
             <DialogDescription>
-              Scan this code to view the post
+              {content.scanQrDesc}
             </DialogDescription>
           </DialogHeader>
           
@@ -285,11 +338,11 @@ const SharePost = () => {
             
             <div className="mt-4 text-center">
               <p className="text-xs md:text-sm text-gray-500 mb-2">
-                This QR code links directly to the post
+                {content.qrLinksTo}
               </p>
               <Button size="sm" variant="outline" onClick={handleCopyLink} className="text-xs md:text-sm">
                 <Link2 className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                Copy Post Link
+                {content.postLinkCopy}
               </Button>
             </div>
           </div>

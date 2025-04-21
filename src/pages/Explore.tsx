@@ -1,117 +1,197 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Search, Compass, Filter, TrendingUp, Map, StarIcon, PlayCircle, Heart, Bookmark } from "lucide-react";
-
-const exploreItems = [
-  {
-    id: 1,
-    title: "Traditional Madhubani Art Techniques",
-    type: "video",
-    thumbnail: "https://images.unsplash.com/photo-1582547078055-a96e58078fcf?q=80&w=500",
-    duration: "12:35",
-    views: 4582,
-    artist: {
-      name: "Ananya Das",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250",
-      location: "Bihar"
-    },
-    liked: false,
-    saved: false
-  },
-  {
-    id: 2,
-    title: "Modern Takes on Ancient Pottery",
-    type: "article",
-    thumbnail: "https://images.unsplash.com/photo-1609686911241-e2b8e180cf89?q=80&w=500",
-    readTime: "8 min read",
-    artist: {
-      name: "Ravi Kumar",
-      avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=250", 
-      location: "Gujarat"
-    },
-    liked: true,
-    saved: true
-  },
-  {
-    id: 3,
-    title: "Pashmina Shawl Weaving Showcase",
-    type: "video",
-    thumbnail: "https://images.unsplash.com/photo-1485125639709-a60c3a500bf1?q=80&w=500",
-    duration: "18:42",
-    views: 2845,
-    artist: {
-      name: "Farooq Ahmed",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250",
-      location: "Kashmir"
-    },
-    liked: false,
-    saved: false
-  },
-  {
-    id: 4,
-    title: "Intricate Brass Work from South India",
-    type: "gallery",
-    thumbnail: "https://images.unsplash.com/photo-1589643385205-318138cfa74a?q=80&w=500",
-    imageCount: 12,
-    artist: {
-      name: "Meera Reddy",
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=250",
-      location: "Tamil Nadu"
-    },
-    liked: true,
-    saved: false
-  },
-  {
-    id: 5,
-    title: "Guide to Natural Dyes for Textiles",
-    type: "article",
-    thumbnail: "https://images.unsplash.com/photo-1530259152377-3a014e1092e0?q=80&w=500",
-    readTime: "15 min read",
-    artist: {
-      name: "Neha Singh",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=250",
-      location: "Rajasthan"
-    },
-    liked: false,
-    saved: true
-  },
-  {
-    id: 6,
-    title: "Woodcarving Techniques for Beginners",
-    type: "video",
-    thumbnail: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?q=80&w=500",
-    duration: "24:18",
-    views: 7832,
-    artist: {
-      name: "Mahesh Patel",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=250",
-      location: "Kerala"
-    },
-    liked: false,
-    saved: false
-  }
-];
-
-const categories = [
-  "All", "Pottery", "Textiles", "Woodwork", "Metalwork", "Painting", 
-  "Jewelry", "Paper Crafts", "Glass Work", "Stone Carving"
-];
-
-const regions = [
-  "All India", "North", "South", "East", "West", "Central", 
-  "Northeast", "Kashmir", "Gujarat", "Rajasthan", "Tamil Nadu"
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 const Explore = () => {
+  const { language, translatePage } = useLanguage();
+  
+  const defaultContent = {
+    pageTitle: "Explore Crafts",
+    pageSubtitle: "Discover amazing handicrafts and artisans across India",
+    searchPlaceholder: "Search for crafts, techniques, artisans...",
+    featuredTitle: "Featured This Week",
+    viewAll: "View All",
+    featuredSubtitle: "The Art of Traditional Block Printing",
+    featuredDescription: "Discover how artisans in Jaipur keep alive the centuries-old technique of block printing, using hand-carved wooden blocks and natural dyes.",
+    watchDocumentary: "Watch Documentary",
+    masterPrinter: "Master Block Printer",
+    like: "Like",
+    save: "Save",
+    loadMore: "Load More",
+    hours: "hours ago",
+    images: "images",
+    views: "views",
+    blocPrinting: "Block Printing",
+  };
+  
+  const [content, setContent] = useState(defaultContent);
+  
+  useEffect(() => {
+    const updateTranslations = async () => {
+      if (language === 'english') {
+        setContent(defaultContent);
+      } else {
+        const translatedContent = await translatePage(defaultContent);
+        setContent(translatedContent);
+      }
+    };
+    
+    updateTranslations();
+  }, [language, translatePage]);
+
+  const defaultCategories = [
+    "All", "Pottery", "Textiles", "Woodwork", "Metalwork", "Painting", 
+    "Jewelry", "Paper Crafts", "Glass Work", "Stone Carving"
+  ];
+  
+  const defaultRegions = [
+    "All India", "North", "South", "East", "West", "Central", 
+    "Northeast", "Kashmir", "Gujarat", "Rajasthan", "Tamil Nadu"
+  ];
+  
+  const [categories, setCategories] = useState(defaultCategories);
+  const [regions, setRegions] = useState(defaultRegions);
+  
+  useEffect(() => {
+    const translateArrays = async () => {
+      if (language === 'english') {
+        setCategories(defaultCategories);
+        setRegions(defaultRegions);
+      } else {
+        const { batchTranslate } = useLanguage();
+        const [translatedCategories, translatedRegions] = await Promise.all([
+          batchTranslate(defaultCategories),
+          batchTranslate(defaultRegions)
+        ]);
+        setCategories(translatedCategories);
+        setRegions(translatedRegions);
+      }
+    };
+    
+    translateArrays();
+  }, [language]);
+
+  const exploreItems = [
+    {
+      id: 1,
+      title: "Traditional Madhubani Art Techniques",
+      type: "video",
+      thumbnail: "https://images.unsplash.com/photo-1582547078055-a96e58078fcf?q=80&w=500",
+      duration: "12:35",
+      views: 4582,
+      artist: {
+        name: "Ananya Das",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=250",
+        location: "Bihar"
+      },
+      liked: false,
+      saved: false
+    },
+    {
+      id: 2,
+      title: "Modern Takes on Ancient Pottery",
+      type: "article",
+      thumbnail: "https://images.unsplash.com/photo-1609686911241-e2b8e180cf89?q=80&w=500",
+      readTime: "8 min read",
+      artist: {
+        name: "Ravi Kumar",
+        avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=250", 
+        location: "Gujarat"
+      },
+      liked: true,
+      saved: true
+    },
+    {
+      id: 3,
+      title: "Pashmina Shawl Weaving Showcase",
+      type: "video",
+      thumbnail: "https://images.unsplash.com/photo-1485125639709-a60c3a500bf1?q=80&w=500",
+      duration: "18:42",
+      views: 2845,
+      artist: {
+        name: "Farooq Ahmed",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=250",
+        location: "Kashmir"
+      },
+      liked: false,
+      saved: false
+    },
+    {
+      id: 4,
+      title: "Intricate Brass Work from South India",
+      type: "gallery",
+      thumbnail: "https://images.unsplash.com/photo-1589643385205-318138cfa74a?q=80&w=500",
+      imageCount: 12,
+      artist: {
+        name: "Meera Reddy",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=250",
+        location: "Tamil Nadu"
+      },
+      liked: true,
+      saved: false
+    },
+    {
+      id: 5,
+      title: "Guide to Natural Dyes for Textiles",
+      type: "article",
+      thumbnail: "https://images.unsplash.com/photo-1530259152377-3a014e1092e0?q=80&w=500",
+      readTime: "15 min read",
+      artist: {
+        name: "Neha Singh",
+        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=250",
+        location: "Rajasthan"
+      },
+      liked: false,
+      saved: true
+    },
+    {
+      id: 6,
+      title: "Woodcarving Techniques for Beginners",
+      type: "video",
+      thumbnail: "https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?q=80&w=500",
+      duration: "24:18",
+      views: 7832,
+      artist: {
+        name: "Mahesh Patel",
+        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=250",
+        location: "Kerala"
+      },
+      liked: false,
+      saved: false
+    }
+  ];
+  
   const [items, setItems] = useState(exploreItems);
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeRegion, setActiveRegion] = useState("All India");
   const [activeView, setActiveView] = useState("grid");
+  
+  useEffect(() => {
+    const translateItems = async () => {
+      if (language === 'english') {
+        setItems(exploreItems);
+      } else {
+        const { batchTranslate } = useLanguage();
+        
+        const titles = exploreItems.map(item => item.title);
+        const translatedTitles = await batchTranslate(titles);
+        
+        const translatedItems = exploreItems.map((item, index) => ({
+          ...item,
+          title: translatedTitles[index]
+        }));
+        
+        setItems(translatedItems);
+      }
+    };
+    
+    translateItems();
+  }, [language]);
   
   const handleLike = (itemId: number) => {
     setItems(items.map(item => {
@@ -134,16 +214,15 @@ const Explore = () => {
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-kala-primary">Explore Crafts</h1>
-        <p className="text-gray-600">Discover amazing handicrafts and artisans across India</p>
+        <h1 className="text-2xl font-bold text-kala-primary">{content.pageTitle}</h1>
+        <p className="text-gray-600">{content.pageSubtitle}</p>
       </div>
       
-      {/* Search and Filters Row */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-grow">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input 
-            placeholder="Search for crafts, techniques, artisans..." 
+            placeholder={content.searchPlaceholder} 
             className="pl-10 bg-white"
           />
         </div>
@@ -172,12 +251,11 @@ const Explore = () => {
         </div>
       </div>
       
-      {/* Categories Scroll */}
       <div className="mb-6 overflow-x-auto pb-2">
         <div className="flex gap-2 min-w-max">
-          {categories.map(category => (
+          {categories.map((category, index) => (
             <Button 
-              key={category}
+              key={index}
               variant={activeCategory === category ? "default" : "outline"}
               className={`rounded-full px-4 py-1 text-sm ${
                 activeCategory === category 
@@ -192,12 +270,11 @@ const Explore = () => {
         </div>
       </div>
       
-      {/* Regions Scroll */}
       <div className="mb-6 overflow-x-auto pb-2">
         <div className="flex gap-2 min-w-max">
-          {regions.map(region => (
+          {regions.map((region, index) => (
             <Button 
-              key={region}
+              key={index}
               variant="ghost"
               className={`px-3 py-1 text-sm ${
                 activeRegion === region 
@@ -213,15 +290,14 @@ const Explore = () => {
         </div>
       </div>
       
-      {/* Featured Section */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <TrendingUp className="text-kala-accent" />
-            Featured This Week
+            {content.featuredTitle}
           </h2>
           <Button variant="ghost" className="text-kala-primary hover:bg-kala-light">
-            View All
+            {content.viewAll}
           </Button>
         </div>
         
@@ -232,10 +308,10 @@ const Explore = () => {
             className="w-full h-80 object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-6">
-            <Badge className="self-start mb-2 bg-kala-accent border-0">Featured</Badge>
-            <h3 className="text-2xl text-white font-bold mb-2">The Art of Traditional Block Printing</h3>
+            <Badge className="self-start mb-2 bg-kala-accent border-0">{content.featuredTitle}</Badge>
+            <h3 className="text-2xl text-white font-bold mb-2">{content.featuredSubtitle}</h3>
             <p className="text-white/90 mb-4 max-w-2xl">
-              Discover how artisans in Jaipur keep alive the centuries-old technique of block printing, using hand-carved wooden blocks and natural dyes.
+              {content.featuredDescription}
             </p>
             <div className="flex items-center gap-4">
               <Avatar className="border-2 border-white">
@@ -244,17 +320,16 @@ const Explore = () => {
               </Avatar>
               <div className="text-white">
                 <div className="font-medium">Sangita Kumari</div>
-                <div className="text-sm opacity-80">Master Block Printer • Jaipur</div>
+                <div className="text-sm opacity-80">{content.masterPrinter} • Jaipur</div>
               </div>
               <Button className="ml-auto bg-white hover:bg-gray-100 text-kala-primary">
-                Watch Documentary
+                {content.watchDocumentary}
               </Button>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Main Content Grid */}
       <div className={activeView === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
         {items.map(item => (
           <Card key={item.id} className={activeView === "list" ? "overflow-hidden flex flex-col md:flex-row" : ""}>
@@ -283,7 +358,7 @@ const Explore = () => {
               {item.type === "gallery" && (
                 <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                  {item.imageCount} images
+                  {item.imageCount} {content.images}
                 </div>
               )}
             </div>
@@ -306,7 +381,7 @@ const Explore = () => {
                 {item.type === "video" && (
                   <div className="flex items-center gap-1">
                     <PlayCircle className="w-4 h-4" />
-                    <span>{item.views.toLocaleString()} views</span>
+                    <span>{item.views.toLocaleString()} {content.views}</span>
                   </div>
                 )}
                 {item.type === "article" && (
@@ -326,7 +401,7 @@ const Explore = () => {
                 onClick={() => handleLike(item.id)}
               >
                 <Heart className={`w-4 h-4 mr-1 ${item.liked ? 'fill-current' : ''}`} />
-                <span>Like</span>
+                <span>{content.like}</span>
               </Button>
               
               <Button 
@@ -336,7 +411,7 @@ const Explore = () => {
                 onClick={() => handleSave(item.id)}
               >
                 <Bookmark className={`w-4 h-4 mr-1 ${item.saved ? 'fill-current' : ''}`} />
-                <span>Save</span>
+                <span>{content.save}</span>
               </Button>
             </CardFooter>
           </Card>
@@ -345,7 +420,7 @@ const Explore = () => {
       
       <div className="flex justify-center mt-8">
         <Button variant="outline" className="text-kala-primary border-kala-primary hover:bg-kala-light">
-          Load More
+          {content.loadMore}
         </Button>
       </div>
     </div>

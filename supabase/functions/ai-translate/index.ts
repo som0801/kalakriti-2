@@ -1,7 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,74 +15,72 @@ serve(async (req) => {
 
   try {
     const { text, targetLanguage } = await req.json();
-    
+
     if (!text || !targetLanguage) {
-      return new Response(
-        JSON.stringify({ error: 'Text and targetLanguage are required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      throw new Error('Missing required parameters: text and targetLanguage');
     }
 
-    if (!openAIApiKey) {
-      return new Response(
-        JSON.stringify({ error: 'OpenAI API key is not configured' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      throw new Error('OpenAI API key not configured');
     }
 
-    // Call OpenAI API directly without using the npm package
+    console.log(`Translating to ${targetLanguage}: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
+
+    // Use OpenAI to translate text
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openaiApiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: 'gpt-4o-mini',
         messages: [
           {
-            role: "system",
-            content: `You are a professional translator. Translate the given text to ${targetLanguage}. Only return the translated text, no explanations or additional information.`
+            role: 'system',
+            content: `You are a professional translator. Translate the following text into ${targetLanguage}. 
+                      Maintain the same tone, style, and formatting as the original.
+                      Only respond with the translated text, nothing else.`
           },
           {
-            role: "user",
+            role: 'user',
             content: text
           }
         ],
-        max_tokens: 1000,
-      }),
+        temperature: 0.3
+      })
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
+      const error = await response.json();
+      throw new Error(`OpenAI API error: ${error.error?.message || response.statusText}`);
     }
 
     const data = await response.json();
-    const translatedText = data.choices[0].message.content?.trim() || text;
+    const translatedText = data.choices[0].message.content.trim();
 
-    console.log(`Translated "${text}" to ${targetLanguage}: "${translatedText}"`);
-    
     return new Response(
-      JSON.stringify({ translatedText }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      JSON.stringify({
+        success: true,
+        translatedText,
+        targetLanguage,
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   } catch (error) {
-    console.error('Translation error:', error);
+    console.error('Error in ai-translate function:', error);
     
     return new Response(
-      JSON.stringify({ error: error.message, translatedText: null }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
+      {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   }

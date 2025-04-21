@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Languages } from "lucide-react";
-import { useTranslation } from "@/hooks/useTranslation";
-import { useLanguage } from "@/context/LanguageContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface TranslationCardProps {
   originalText: string;
@@ -17,9 +16,8 @@ export const TranslationCard = ({
 }: TranslationCardProps) => {
   const [isTranslated, setIsTranslated] = useState(false);
   const [displayText, setDisplayText] = useState(originalText);
-  const { translate, loading } = useTranslation();
   const { toast } = useToast();
-  const { language, translateText } = useLanguage();
+  const { language, translateText, isTranslating } = useLanguage();
   
   const [buttonText, setButtonText] = useState({
     translate: "Translate",
@@ -89,10 +87,7 @@ export const TranslationCard = ({
     } else {
       // Translate
       try {
-        const result = await translate({
-          text: originalText,
-          targetLanguage: language
-        });
+        const result = await translateText(originalText);
         
         if (result) {
           setDisplayText(result);
@@ -123,7 +118,7 @@ export const TranslationCard = ({
           variant="outline"
           size="sm"
           className="text-xs h-8 px-2 flex items-center"
-          disabled={loading}
+          disabled={isTranslating}
         >
           <Languages className="mr-1 h-3 w-3" />
           {isTranslated ? buttonText.original : buttonText.translate}
