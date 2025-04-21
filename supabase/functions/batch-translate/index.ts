@@ -30,17 +30,6 @@ serve(async (req) => {
     // Prepare the text for batch translation
     const combinedText = texts.map((text, index) => `[${index}]: ${text}`).join('\n\n');
 
-    // Create language context for better translations
-    const languageContext = {
-      'hindi': 'Hindi (हिंदी) is widely spoken across India with specific terminology and cultural references.',
-      'tamil': 'Tamil (தமிழ்) has unique linguistic features and cultural nuances specific to Tamil Nadu.',
-      'telugu': 'Telugu (తెలుగు) has specific terminology and expressions used in Andhra Pradesh and Telangana.',
-      'bengali': 'Bengali (বাংলা) has particular cultural and linguistic expressions used in West Bengal.',
-      'marathi': 'Marathi (मराठी) has distinctive vocabulary and expressions used in Maharashtra.'
-    };
-
-    const contextInfo = languageContext[targetLanguage.toLowerCase()] || '';
-
     // Use OpenAI to translate text
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -53,8 +42,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a professional translator specialized in Indian languages. ${contextInfo}
-                      Translate the following numbered texts into ${targetLanguage}. 
+            content: `You are a professional translator. Translate the following numbered texts into ${targetLanguage}. 
                       Maintain the exact same format with the indices in brackets.
                       Example:
                       [0]: Hello
@@ -64,16 +52,14 @@ serve(async (req) => {
                       [0]: नमस्ते
                       [1]: आप कैसे हैं?
                       
-                      Only respond with the translated text, keeping the exact same [index] format.
-                      Ensure translations preserve the meaning and cultural context appropriately.
-                      Preserve any special characters, HTML markup, or formatting in the original text.`
+                      Only respond with the translated text, keeping the exact same [index] format.`
           },
           {
             role: 'user',
             content: combinedText
           }
         ],
-        temperature: 0.2
+        temperature: 0.3
       })
     });
 
