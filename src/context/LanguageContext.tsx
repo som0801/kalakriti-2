@@ -12,6 +12,9 @@ import React, {
 // Make sure Language type is exported
 export type Language = 'english' | 'hindi' | 'tamil' | 'telugu' | 'bengali' | 'marathi';
 
+// Create an array of valid language values to check against
+const VALID_LANGUAGES: Language[] = ['english', 'hindi', 'tamil', 'telugu', 'bengali', 'marathi'];
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
@@ -245,7 +248,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   // Load saved language preference from localStorage
   useEffect(() => {
     const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage && Object.values(Language).includes(savedLanguage as Language)) {
+    if (savedLanguage && VALID_LANGUAGES.includes(savedLanguage as Language)) {
       setLanguage(savedLanguage as Language);
     }
   }, []);
