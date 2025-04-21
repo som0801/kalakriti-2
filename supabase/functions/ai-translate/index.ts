@@ -27,7 +27,18 @@ serve(async (req) => {
 
     console.log(`Translating to ${targetLanguage}: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
 
-    // Use OpenAI to translate text
+    // Create a more robust translation prompt specific to Indian languages
+    const languageContext = {
+      'hindi': 'Hindi (हिंदी) is an Indo-Aryan language spoken primarily in India.',
+      'tamil': 'Tamil (தமிழ்) is a Dravidian language spoken primarily in Tamil Nadu, India and Sri Lanka.',
+      'telugu': 'Telugu (తెలుగు) is a Dravidian language spoken primarily in Andhra Pradesh and Telangana, India.',
+      'bengali': 'Bengali (বাংলা) is an Indo-Aryan language spoken primarily in West Bengal, India and Bangladesh.',
+      'marathi': 'Marathi (मराठी) is an Indo-Aryan language spoken primarily in Maharashtra, India.'
+    };
+
+    const contextInfo = languageContext[targetLanguage.toLowerCase()] || '';
+
+    // Use OpenAI to translate text with improved context
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -39,16 +50,18 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a professional translator. Translate the following text into ${targetLanguage}. 
-                      Maintain the same tone, style, and formatting as the original.
-                      Only respond with the translated text, nothing else.`
+            content: `You are a professional translator specialized in Indian languages. ${contextInfo} 
+                      Translate the following text into ${targetLanguage}. 
+                      Maintain the same tone, style, formatting, and cultural context as the original.
+                      Only respond with the translated text, nothing else.
+                      Preserve any special characters, HTML markup, or formatting in the original text.`
           },
           {
             role: 'user',
             content: text
           }
         ],
-        temperature: 0.3
+        temperature: 0.2
       })
     });
 

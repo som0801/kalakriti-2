@@ -14,14 +14,14 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, style, duration, resolution } = await req.json();
+    const { prompt, style, duration, resolution, language } = await req.json();
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key is not configured');
     }
 
-    console.log('Received video generation request:', { prompt, style, duration, resolution });
+    console.log('Received video generation request:', { prompt, style, duration, resolution, language });
 
     // Generate video concept description using OpenAI
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -35,7 +35,10 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a video generation AI assistant. Create a detailed scene-by-scene description for a ${duration || '30 second'} video in ${style || 'cinematic'} style with ${resolution || '1080p'} resolution.`
+            content: `You are a video generation AI assistant specializing in traditional Indian handicrafts and artforms. 
+                      Create a detailed scene-by-scene description for a ${duration || '30 second'} video in ${style || 'cinematic'} style with ${resolution || '1080p'} resolution.
+                      The video should showcase the cultural significance and craftsmanship of the artisan product.
+                      If a specific language is requested (${language || 'English'}), tailor the narration script appropriately for that language.`
           },
           {
             role: 'user',
@@ -54,19 +57,25 @@ serve(async (req) => {
 
     const storyboard = data.choices[0].message.content;
     
+    // Generate a unique identifier for the video
+    const videoId = crypto.randomUUID();
+    
     // For now, this is a simulation of video generation
     // In a real implementation, you would call a video generation API
     const generatedVideo = {
-      id: crypto.randomUUID(),
+      id: videoId,
       prompt: prompt,
       style: style || 'cinematic',
       duration: duration || '30 seconds',
       resolution: resolution || '1080p',
+      language: language || 'English',
       storyboard: storyboard,
       status: "processing",
       estimated_completion: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // Estimate 5 minutes
       thumbnail_url: "https://placehold.co/600x400/5535dd/ffffff?text=Video+Processing",
-      video_preview_url: null
+      video_preview_url: null,
+      social_media_ready: false,
+      voiceover_language: language || 'English'
     };
 
     console.log('Returning generated video data:', generatedVideo);

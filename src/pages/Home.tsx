@@ -1,155 +1,175 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Film, Image, Video, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { 
+  Film, 
+  MonitorPlay, 
+  Image as ImageIcon, 
+  Users, 
+  ArrowRight 
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/context/AuthContext";
+import { useProfile } from "@/hooks/useProfile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLanguage } from "@/context/LanguageContext";
 
 const Home = () => {
-  const isMobile = useIsMobile();
+  const { user } = useAuth();
+  const { profile } = useProfile();
   const { language, translatePage } = useLanguage();
   
-  // Define all page content in English (default language)
   const defaultContent = {
     welcome: "Welcome to Kalakriti",
-    hello: "👋 Hello, Artisan!",
-    showcase: "Showcase Your Handicraft",
-    useAITools: "Use our AI tools to create stunning videos and marketing materials for your art",
+    greeting: "Hello, Artisan!",
+    showcaseTitle: "Showcase Your Handicraft",
+    showcaseDesc: "Use our AI tools to create stunning videos and marketing materials for your art",
     getStarted: "Get Started",
     watchTutorial: "Watch Tutorial",
-    recentActivity: "Recent Community Activity",
-    viewAllActivity: "View All Activity",
-    artisanShowcase: "Artisan Showcase",
-    newUpload: "New traditional handicraft video uploaded by Artisan",
-    hoursAgo: "hours ago",
-    videoEnhancerTitle: "Video Enhancer & Translator",
+    videoEnhancer: "Video Enhancer & Translator",
     videoEnhancerDesc: "Enhance and translate your videos with multilingual narration",
-    adGeneratorTitle: "AI Ad Generator",
+    adGenerator: "AI Ad Generator",
     adGeneratorDesc: "Create beautiful ad templates for your handicraft products",
-    videoGeneratorTitle: "AI Video Generator",
+    videoGenerator: "AI Video Generator",
     videoGeneratorDesc: "Generate videos from text prompts in multiple languages",
-    communityFeedTitle: "Community Feed",
-    communityFeedDesc: "Connect with fellow artisans and explore their creations"
+    communityFeed: "Community Feed",
+    communityFeedDesc: "Connect with fellow artisans and explore their creations",
+    recentActivity: "Recent Community Activity",
+    hoursAgo: "hours ago",
+    artisanShowcase: "Artisan Showcase #1",
+    newTraditionalHandicraft: "New traditional handicraft video uploaded by Artisan #1"
   };
   
-  // State to hold translated content
   const [content, setContent] = useState(defaultContent);
   
-  // Translate UI when language changes
   useEffect(() => {
     const updateTranslations = async () => {
       if (language === 'english') {
         setContent(defaultContent);
       } else {
         const translatedContent = await translatePage(defaultContent);
-        // Fix TypeScript error by ensuring correct type
-        setContent(translatedContent as typeof defaultContent);
+        setContent(translatedContent);
       }
     };
     
     updateTranslations();
   }, [language, translatePage]);
 
-  // Features data with translations
-  const features = [
-    {
-      title: content.videoEnhancerTitle,
-      description: content.videoEnhancerDesc,
-      icon: <Film className="h-8 w-8 md:h-10 md:w-10 text-kala-primary" />,
-      link: "/video-enhancer",
-      color: "bg-purple-50",
-    },
-    {
-      title: content.adGeneratorTitle,
-      description: content.adGeneratorDesc,
-      icon: <Image className="h-8 w-8 md:h-10 md:w-10 text-kala-primary" />,
-      link: "/ad-generator",
-      color: "bg-blue-50",
-    },
-    {
-      title: content.videoGeneratorTitle,
-      description: content.videoGeneratorDesc,
-      icon: <Video className="h-8 w-8 md:h-10 md:w-10 text-kala-primary" />,
-      link: "/video-generator",
-      color: "bg-green-50",
-    },
-    {
-      title: content.communityFeedTitle,
-      description: content.communityFeedDesc,
-      icon: <Users className="h-8 w-8 md:h-10 md:w-10 text-kala-primary" />,
-      link: "/community",
-      color: "bg-orange-50",
-    },
-  ];
-
   return (
-    <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
-      <div className="max-w-5xl mx-auto">
-        <section className="mb-8 md:mb-12">
-          <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h1 className="text-xl md:text-3xl font-bold text-kala-dark">{content.welcome}</h1>
-            <p className="text-kala-primary">{content.hello}</p>
+    <div className="container mx-auto py-6 px-4 space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{content.welcome}</h1>
+        {user && profile && (
+          <div className="flex items-center gap-2">
+            <span className="text-kala-primary">👋 {content.greeting}</span>
           </div>
-          
-          <div className="bg-gradient-to-r from-kala-primary to-kala-accent rounded-xl md:rounded-2xl p-4 md:p-6 text-white mb-6 md:mb-8">
-            <h2 className="text-lg md:text-2xl font-bold mb-2">{content.showcase}</h2>
-            <p className="mb-4 text-sm md:text-base">{content.useAITools}</p>
-            <div className="flex space-x-3 md:space-x-4">
-              <Link to="/create" className="bg-white text-kala-primary px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm md:font-medium hover:bg-kala-light transition-colors">
-                {content.getStarted}
-              </Link>
-              <Link to="/tutorial" className="bg-transparent border border-white text-white px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm md:font-medium hover:bg-white/10 transition-colors">
-                {content.watchTutorial}
-              </Link>
+        )}
+      </div>
+      
+      <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-xl p-6 md:p-8 text-white">
+        <h2 className="text-xl md:text-2xl font-bold mb-2">{content.showcaseTitle}</h2>
+        <p className="mb-6 opacity-90">{content.showcaseDesc}</p>
+        <div className="flex flex-wrap gap-3">
+          <Button variant="secondary" asChild>
+            <Link to="/video-enhancer">{content.getStarted}</Link>
+          </Button>
+          <Button variant="outline" className="bg-white/10 hover:bg-white/20 border-white/20">
+            <Link to="/tutorial">{content.watchTutorial}</Link>
+          </Button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <Card className="bg-purple-50 border-purple-100 hover:border-purple-200 transition-all">
+          <CardContent className="p-6">
+            <div className="flex flex-col h-full">
+              <div className="mb-4 text-purple-500">
+                <Film className="h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">{content.videoEnhancer}</h3>
+              <p className="text-gray-600 mb-4 flex-grow">{content.videoEnhancerDesc}</p>
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/video-enhancer" className="flex justify-between items-center">
+                  <span>{content.getStarted}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-6">
-            {features.map((feature, index) => (
-              <Link to={feature.link} key={index}>
-                <Card className={`card-hover h-full ${feature.color} border-none`}>
-                  <CardHeader className="pb-2 md:pb-3 pt-3 md:pt-4 px-3 md:px-4">
-                    <CardTitle className="flex items-center gap-2 md:gap-3 text-base md:text-lg">
-                      {feature.icon}
-                      {feature.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-3 md:pb-4 px-3 md:px-4">
-                    <CardDescription className="text-kala-dark text-sm md:text-base">
-                      {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </section>
+          </CardContent>
+        </Card>
         
-        <section className="mb-6 md:mb-8">
-          <h2 className="text-lg md:text-2xl font-bold mb-4 md:mb-6 text-kala-dark">{content.recentActivity}</h2>
-          <div className="bg-white rounded-xl shadow-sm p-3 md:p-4">
-            <div className="space-y-3 md:space-y-4">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="flex items-start gap-3 md:gap-4 pb-3 md:pb-4 border-b last:border-0">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-kala-light flex items-center justify-center">
-                    <Users className="h-5 w-5 md:h-6 md:w-6 text-kala-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm md:text-base">{content.artisanShowcase} #{item}</h3>
-                    <p className="text-kala-neutral text-xs md:text-sm">{content.newUpload} #{item}</p>
-                    <p className="text-xs text-gray-500 mt-1">2 {content.hoursAgo}</p>
-                  </div>
-                </div>
-              ))}
+        <Card className="bg-blue-50 border-blue-100 hover:border-blue-200 transition-all">
+          <CardContent className="p-6">
+            <div className="flex flex-col h-full">
+              <div className="mb-4 text-blue-500">
+                <ImageIcon className="h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">{content.adGenerator}</h3>
+              <p className="text-gray-600 mb-4 flex-grow">{content.adGeneratorDesc}</p>
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/ad-generator" className="flex justify-between items-center">
+                  <span>{content.getStarted}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
-            <div className="mt-3 md:mt-4 text-center">
-              <Link to="/community" className="text-kala-primary hover:underline text-sm">
-                {content.viewAllActivity}
-              </Link>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-green-50 border-green-100 hover:border-green-200 transition-all">
+          <CardContent className="p-6">
+            <div className="flex flex-col h-full">
+              <div className="mb-4 text-green-500">
+                <MonitorPlay className="h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">{content.videoGenerator}</h3>
+              <p className="text-gray-600 mb-4 flex-grow">{content.videoGeneratorDesc}</p>
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/video-generator" className="flex justify-between items-center">
+                  <span>{content.getStarted}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
-          </div>
-        </section>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-violet-50 border-violet-100 hover:border-violet-200 transition-all">
+          <CardContent className="p-6">
+            <div className="flex flex-col h-full">
+              <div className="mb-4 text-violet-500">
+                <Users className="h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-medium mb-2">{content.communityFeed}</h3>
+              <p className="text-gray-600 mb-4 flex-grow">{content.communityFeedDesc}</p>
+              <Button variant="outline" className="w-full" asChild>
+                <Link to="/community" className="flex justify-between items-center">
+                  <span>{content.getStarted}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div>
+        <h2 className="text-xl font-semibold mb-4">{content.recentActivity}</h2>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3 py-4 border-b border-gray-100">
+              <Avatar>
+                <AvatarFallback>A1</AvatarFallback>
+              </Avatar>
+              <div>
+                <h4 className="font-medium">{content.artisanShowcase}</h4>
+                <p className="text-gray-600 text-sm">{content.newTraditionalHandicraft}</p>
+                <p className="text-gray-400 text-xs mt-1">2 {content.hoursAgo}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
