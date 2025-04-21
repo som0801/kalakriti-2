@@ -1,19 +1,20 @@
 
 import { ReactNode } from "react";
-import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import Logo from "@/components/ui/logo";
-import { useLanguage } from "@/context/LanguageContext";
 
-const Layout = () => {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { language } = useLanguage();
   
   const isAuthPage = 
     location.pathname === "/login" || 
@@ -46,7 +47,7 @@ const Layout = () => {
         navigate("/login", { state: { from: location.pathname } });
       }
     }
-  }, [user, loading, isAuthPage, location.pathname, navigate, hasAuthParams, language]);
+  }, [user, loading, isAuthPage, location.pathname, navigate, hasAuthParams]);
 
   // Show loading state while checking auth
   if (loading || hasAuthParams) {
@@ -65,7 +66,7 @@ const Layout = () => {
     <div className="flex flex-col min-h-screen bg-gray-50">
       {!isAuthPage && <Navbar />}
       <main className="flex-grow safe-area-inset-top safe-area-inset-bottom">
-        <Outlet />
+        {children}
       </main>
     </div>
   );

@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useLogout } from "@/hooks/useLogout";
 import { useProfile } from "@/hooks/useProfile";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings, LogOut, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -25,7 +25,7 @@ const UserMenu = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="outline-none">
+      <DropdownMenuTrigger className="flex items-center gap-2 outline-none">
         <Avatar className="h-8 w-8">
           <AvatarImage src={profile?.avatar_url || ""} alt={profile?.full_name || user.email || ""} />
           <AvatarFallback className="bg-kala-primary text-white">
@@ -34,6 +34,9 @@ const UserMenu = () => {
               : user.email?.charAt(0).toUpperCase() || <User size={16} />}
           </AvatarFallback>
         </Avatar>
+        <span className="hidden md:inline-block text-sm font-medium">
+          {profile?.full_name || user.email?.split('@')[0] || 'User'}
+        </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
