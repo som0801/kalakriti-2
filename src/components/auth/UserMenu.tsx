@@ -34,9 +34,6 @@ const UserMenu = () => {
               : user.email?.charAt(0).toUpperCase() || <User size={16} />}
           </AvatarFallback>
         </Avatar>
-        <span className="hidden md:inline-block text-sm font-medium">
-          {profile?.full_name || user.email?.split('@')[0] || 'User'}
-        </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>

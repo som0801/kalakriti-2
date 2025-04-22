@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <style>
+    .thread { stroke: #D35400; stroke-width: 2; fill: none; }
+    .shuttle { fill: #6D4C41; }
+    .fabric { fill: #FFF3E0; stroke: #8D6E63; stroke-width: 1; }
+    .pattern { fill: #E65100; opacity: 0.2; }
+  </style>
+  
+  <!-- Loom Frame -->
+  <rect x="100" y="100" width="600" height="400" fill="none" stroke="#795548" stroke-width="20"/>
+  
+  <!-- Woven Fabric -->
+  <path class="fabric" d="M150 150 h500 v300 h-500 v-300 z">
+    <pattern id="weave" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect class="pattern" x="0" y="0" width="10" height="10"/>
+      <rect class="pattern" x="10" y="10" width="10" height="10"/>
+    </pattern>
+  </path>
+  
+  <!-- Vertical Threads -->
+  <g class="thread">
+    <path d="M200 120 v360"/>
+    <path d="M300 120 v360"/>
+    <path d="M400 120 v360"/>
+    <path d="M500 120 v360"/>
+    <path d="M600 120 v360"/>
+  </g>
+  
+  <!-- Horizontal Threads -->
+  <g class="thread">
+    <path d="M120 200 h560"/>
+    <path d="M120 300 h560"/>
+    <path d="M120 400 h560"/>
+  </g>
+  
+  <!-- Shuttle -->
+  <path class="shuttle" d="M350 250 l60 20 l-60 20 z"/>
+</svg>

@@ -100,7 +100,7 @@ const Profile = () => {
       const { error } = await supabase
         .from('profiles')
         .update({
-          full_name: profileData.name,
+          full_name: "",
           bio: profileData.bio,
           avatar_url: profileData.avatar_url,
           updated_at: new Date().toISOString()
@@ -320,7 +320,6 @@ const Profile = () => {
               </div>
             ) : (
               <div className="text-center">
-                <h2 className="text-xl font-semibold">{profileData.name || "Your Name"}</h2>
                 <p className="text-kala-accent font-medium">{profileData.artworkType}</p>
                 <Badge className="mt-2 bg-kala-light text-kala-primary hover:bg-kala-light">
                   {profileData.experience}
