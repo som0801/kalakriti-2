@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <style>
+    .paper { fill: #F5F5F5; }
+    .fold { stroke: #BDBDBD; stroke-width: 1; fill: none; }
+    .cut { stroke: #9E9E9E; stroke-width: 2; fill: none; }
+    .shadow { fill: #E0E0E0; }
+  </style>
+  
+  <!-- Base Paper -->
+  <rect class="paper" x="100" y="100" width="600" height="400">
+    <pattern id="paperTexture" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect fill="#EEEEEE" width="10" height="10"/>
+      <path fill="#E0E0E0" opacity="0.5" d="M0 0 h5 v5 h-5 z"/>
+    </pattern>
+  </rect>
+  
+  <!-- Fold Lines -->
+  <g class="fold">
+    <path d="M100 300 h600" stroke-dasharray="5,5"/>
+    <path d="M400 100 v400" stroke-dasharray="5,5"/>
+    <path d="M100 100 l600 400" stroke-dasharray="5,5"/>
+    <path d="M700 100 l-600 400" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Cut Pattern -->
+  <g class="cut">
+    <path d="M300 200 q100 0 200 100"/>
+    <path d="M300 400 q100 0 200 -100"/>
+    <circle cx="400" cy="300" r="50"/>
+  </g>
+  
+  <!-- Decorative Elements -->
+  <g class="shadow">
+    <path d="M250 250 l50 50 l50 -50 l-50 -50 z"/>
+    <path d="M450 250 l50 50 l50 -50 l-50 -50 z"/>
+    <circle cx="400" cy="300" r="25"/>
+  </g>
+  
+  <!-- Origami Crane -->
+  <g transform="translate(400,300) scale(0.5)">
+    <path class="paper" d="M0 0 l100 100 l100 -100 l-100 -100 z"/>
+    <path class="fold" d="M0 0 l100 100 M0 0 l100 -100 M200 0 l-100 100 M200 0 l-100 -100"/>
+  </g>
+</svg>

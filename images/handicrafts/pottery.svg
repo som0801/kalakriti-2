@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <style>
+    .clay { fill: #B77B56; }
+    .highlight { fill: #D7956C; }
+    .shadow { fill: #8B5E3C; }
+    .pattern { fill: none; stroke: #8B5E3C; stroke-width: 2; }
+  </style>
+  
+  <!-- Potter's Wheel Base -->
+  <circle cx="400" cy="500" r="80" fill="#5D4037"/>
+  
+  <!-- Clay Pot -->
+  <path class="clay" d="M300 300 Q400 200 500 300 Q450 400 400 450 Q350 400 300 300 Z">
+    <animate attributeName="d" dur="4s" repeatCount="indefinite"
+      values="M300 300 Q400 200 500 300 Q450 400 400 450 Q350 400 300 300 Z;
+              M320 300 Q400 220 480 300 Q440 390 400 440 Q360 390 320 300 Z;
+              M300 300 Q400 200 500 300 Q450 400 400 450 Q350 400 300 300 Z"/>
+  </path>
+  
+  <!-- Highlights -->
+  <path class="highlight" d="M320 320 Q400 240 480 320" fill="none" stroke-width="10"/>
+  
+  <!-- Decorative Patterns -->
+  <g class="pattern">
+    <circle cx="400" cy="350" r="30"/>
+    <path d="M350 300 Q400 280 450 300"/>
+    <path d="M360 380 Q400 400 440 380"/>
+  </g>
+  
+  <!-- Hands Shaping -->
+  <path fill="#8D6E63" d="M280 340 Q300 320 320 340 Q310 360 280 340 Z"/>
+  <path fill="#8D6E63" d="M520 340 Q500 320 480 340 Q490 360 520 340 Z"/>
+</svg>

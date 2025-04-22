@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <style>
+    .fabric { fill: #FFF3E0; }
+    .thread { stroke-width: 2; fill: none; }
+    .pattern { fill: none; stroke-width: 1.5; }
+    .flower { fill: none; stroke-width: 2; }
+  </style>
+  
+  <!-- Base Fabric -->
+  <rect class="fabric" x="100" y="100" width="600" height="400">
+    <pattern id="fabricTexture" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path fill="#E6D5C3" opacity="0.1" d="M0 0 h5 v5 h-5 z"/>
+    </pattern>
+  </rect>
+  
+  <!-- Embroidered Flowers -->
+  <g class="flower">
+    <path stroke="#E91E63" d="M300 300 q20 -20 40 0 q20 20 0 40 q-20 20 -40 0 q-20 -20 0 -40 z">
+      <animate attributeName="stroke-dashoffset" from="0" to="100" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path stroke="#9C27B0" d="M400 250 q20 -20 40 0 q20 20 0 40 q-20 20 -40 0 q-20 -20 0 -40 z"/>
+    <path stroke="#2196F3" d="M500 350 q20 -20 40 0 q20 20 0 40 q-20 20 -40 0 q-20 -20 0 -40 z"/>
+  </g>
+  
+  <!-- Decorative Patterns -->
+  <g class="pattern">
+    <path stroke="#FF9800" d="M200 200 q100 0 0 100 q100 0 0 -100"/>
+    <path stroke="#4CAF50" d="M600 200 q-100 0 0 100 q-100 0 0 -100"/>
+  </g>
+  
+  <!-- Running Stitch Border -->
+  <g class="thread">
+    <path stroke="#795548" stroke-dasharray="5,5" d="M150 150 h500 v300 h-500 v-300 z">
+      <animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- Center Medallion -->
+  <g class="pattern" transform="translate(400,300)">
+    <circle stroke="#F44336" r="50"/>
+    <circle stroke="#3F51B5" r="40"/>
+    <path stroke="#009688" d="M-30 0 h60 M0 -30 v60"/>
+  </g>
+</svg>

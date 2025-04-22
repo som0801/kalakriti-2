@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <style>
+    .wood { fill: #8B4513; }
+    .carving { fill: #A0522D; }
+    .detail { fill: none; stroke: #6B3E26; stroke-width: 2; }
+    .tool { fill: #4A4A4A; stroke: #2E2E2E; stroke-width: 1; }
+  </style>
+  
+  <!-- Wooden Panel -->
+  <rect class="wood" x="100" y="100" width="600" height="400" rx="10">
+    <pattern id="woodgrain" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <path fill="#6B3E26" opacity="0.1" d="M0 0 Q50 50 100 0 Q50 50 0 100"/>
+    </pattern>
+  </rect>
+  
+  <!-- Carved Design -->
+  <g class="carving">
+    <path d="M200 200 Q400 150 600 200 Q400 250 200 200 Z"/>
+    <path d="M300 300 Q400 280 500 300 Q400 320 300 300 Z"/>
+    <circle cx="400" cy="250" r="50"/>
+  </g>
+  
+  <!-- Detailed Patterns -->
+  <g class="detail">
+    <path d="M250 220 Q400 200 550 220"/>
+    <path d="M350 310 Q400 300 450 310"/>
+    <circle cx="400" cy="250" r="30"/>
+  </g>
+  
+  <!-- Carving Tools -->
+  <g class="tool">
+    <path d="M650 150 l50 -20 l10 10 l-50 20 z"/>
+    <path d="M680 180 l40 -10 l5 15 l-40 10 z"/>
+  </g>
+  
+  <!-- Decorative Flourishes -->
+  <g class="detail">
+    <path d="M200 400 Q400 380 600 400"/>
+    <path d="M300 420 Q400 410 500 420"/>
+  </g>
+</svg>

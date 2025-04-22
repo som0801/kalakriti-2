@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <style>
+    .metal { fill: #B8B8B8; }
+    .highlight { fill: #D4D4D4; }
+    .shadow { fill: #898989; }
+    .pattern { fill: none; stroke: #898989; stroke-width: 2; }
+    .hammer { fill: #4A4A4A; }
+    .handle { fill: #8B4513; }
+  </style>
+  
+  <!-- Metal Sheet -->
+  <rect class="metal" x="200" y="200" width="400" height="300" rx="5">
+    <animate attributeName="fill" dur="3s" repeatCount="indefinite"
+      values="#B8B8B8;#D4D4D4;#B8B8B8"/>
+  </rect>
+  
+  <!-- Embossed Design -->
+  <g class="pattern">
+    <circle cx="400" cy="350" r="100"/>
+    <path d="M300 350 Q400 300 500 350"/>
+    <path d="M300 400 Q400 450 500 400"/>
+  </g>
+  
+  <!-- Decorative Details -->
+  <g class="highlight">
+    <circle cx="400" cy="350" r="50"/>
+    <path d="M350 350 Q400 330 450 350"/>
+  </g>
+  
+  <!-- Tools -->
+  <g transform="translate(600,150) rotate(45)">
+    <rect class="hammer" width="60" height="30"/>
+    <rect class="handle" x="-120" y="10" width="120" height="10"/>
+  </g>
+  
+  <!-- Metallic Texture -->
+  <g class="shadow" opacity="0.1">
+    <path d="M200 200 l400 0" stroke-dasharray="5,5"/>
+    <path d="M200 250 l400 0" stroke-dasharray="5,5"/>
+    <path d="M200 300 l400 0" stroke-dasharray="5,5"/>
+  </g>
+</svg>

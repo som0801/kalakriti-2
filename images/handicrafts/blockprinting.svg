@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <style>
+    .block { fill: #8B4513; }
+    .pattern { fill: #D35400; }
+    .fabric { fill: #FFF3E0; }
+    .print { fill: #E65100; opacity: 0.8; }
+  </style>
+  
+  <!-- Fabric Background -->
+  <rect class="fabric" x="100" y="100" width="600" height="400">
+    <pattern id="fabricTexture" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path fill="#E6D5C3" opacity="0.1" d="M0 0 h5 v5 h-5 z"/>
+    </pattern>
+  </rect>
+  
+  <!-- Printed Pattern -->
+  <g class="print">
+    <g transform="translate(200,200)">
+      <circle r="30"/>
+      <path d="M-20 0 h40 M0 -20 v40"/>
+    </g>
+    <g transform="translate(400,200)">
+      <circle r="30"/>
+      <path d="M-20 0 h40 M0 -20 v40"/>
+    </g>
+    <g transform="translate(600,200)">
+      <circle r="30"/>
+      <path d="M-20 0 h40 M0 -20 v40"/>
+    </g>
+    <g transform="translate(200,400)">
+      <circle r="30"/>
+      <path d="M-20 0 h40 M0 -20 v40"/>
+    </g>
+    <g transform="translate(400,400)">
+      <circle r="30"/>
+      <path d="M-20 0 h40 M0 -20 v40"/>
+    </g>
+    <g transform="translate(600,400)">
+      <circle r="30"/>
+      <path d="M-20 0 h40 M0 -20 v40"/>
+    </g>
+  </g>
+  
+  <!-- Printing Block -->
+  <g transform="translate(400,300)">
+    <rect class="block" x="-50" y="-50" width="100" height="100"/>
+    <g class="pattern">
+      <circle cx="0" cy="0" r="30"/>
+      <path d="M-20 0 h40 M0 -20 v40"/>
+    </g>
+    <rect fill="none" stroke="#5D4037" stroke-width="4" x="-50" y="-50" width="100" height="100"/>
+  </g>
+  
+  <!-- Handle -->
+  <path class="block" d="M350 300 v-50 h100 v50" fill="#5D4037"/>
+</svg>
